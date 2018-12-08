@@ -7,7 +7,18 @@ King::King(Colour col)
 
 std::vector<Board> King::getCandidateMoves(Board &b, Locus from) const
 {
-    return std::vector<Board>();
+    static const PieceMovementSpec kingMovementSpec = {
+        {Direction::NORTH},
+        {Direction::EAST},
+        {Direction::SOUTH},
+        {Direction::WEST},
+        {Direction::NORTH, Direction::EAST},
+        {Direction::NORTH, Direction::WEST},
+        {Direction::SOUTH, Direction::EAST},
+        {Direction::SOUTH, Direction::WEST}
+    };
+
+    return applyTranslationSpec(b, from, kingMovementSpec, true);
 }
 
 void King::printPiece(std::ostream &stream) const
