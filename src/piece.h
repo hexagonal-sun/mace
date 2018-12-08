@@ -45,6 +45,7 @@ public:
     int getValue(void) const;
     void setSquare(std::shared_ptr<BoardSquare>);
     Colour getColour(void) const;
+    bool operator==(const Piece &other) const;
 protected:
     std::vector<Board> applyTranslationSpec(const Board &b, Locus &from,
                                             const PieceMovementSpec &ms,

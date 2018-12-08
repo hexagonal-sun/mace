@@ -62,3 +62,11 @@ int Piece::getValue(void) const
     else
         return -mag;
 }
+
+bool Piece::operator==(const Piece &other) const
+{
+    if (typeid(*this) != typeid(other))
+        return false;
+
+    return getColour() == other.getColour();
+}
