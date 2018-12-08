@@ -15,7 +15,7 @@ Board::Board(board_t b, Colour nextMoveColour)
     evaluatePosition();
 }
 
-BoardSquare & Board::getSquare(std::string name)
+const BoardSquare & Board::getSquare(std::string name) const
 {
     if (name.length() != 2)
         throw std::invalid_argument("square specifier of incorrect format");
@@ -26,7 +26,7 @@ BoardSquare & Board::getSquare(std::string name)
     return board_.at(Locus(rank, file));
 }
 
-Board Board::move(BoardSquare &from, BoardSquare &to)
+Board Board::move(const BoardSquare &from, const BoardSquare &to) const
 {
     // Some basic sanity checks here...
     if (!from.isOccupied())
@@ -47,12 +47,12 @@ Board Board::move(BoardSquare &from, BoardSquare &to)
     return Board(newBoard, getOppositeColour(nextMoveColour_));
 }
 
-Board Board::move(std::string from, std::string to)
+Board Board::move(std::string from, std::string to) const
 {
     return move(getSquare(from), getSquare(to));
 }
 
-Board Board::move(Locus from, Locus to)
+Board Board::move(Locus from, Locus to) const
 {
     return move(board_.at(from), board_.at(to));
 }
@@ -97,12 +97,12 @@ bool Board::canMoveToSquare(Locus l, Colour c) const
     return false;
 }
 
-BoardSquare & Board::operator[](const Locus &l)
+const BoardSquare & Board::operator[](const Locus &l) const
 {
     return board_.at(l);
 }
 
-std::vector<Board> Board::getAllCandidateMoves(void)
+std::vector<Board> Board::getAllCandidateMoves(void) const
 {
     std::vector<Board> ret;
 

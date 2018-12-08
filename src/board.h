@@ -16,14 +16,14 @@ class Board
 public:
     Board(board_t b, Colour nextMoveColour);
     static Board getStartingBoard(void);
-    Board move(std::string from, std::string to);
-    Board move(BoardSquare &from, BoardSquare &to);
-    Board move(Locus from, Locus to);
+    Board move(std::string from, std::string to) const;
+    Board move(const BoardSquare &from, const BoardSquare &to) const;
+    Board move(Locus from, Locus to) const;
     bool canMoveToSquare(Locus l, Colour c) const;
-    std::vector<Board> getAllCandidateMoves(void);
-    BoardSquare & getSquare(std::string name);
+    std::vector<Board> getAllCandidateMoves(void) const;
+    const BoardSquare & getSquare(std::string name) const;
     void printBoard(std::ostream &stream) const;
-    BoardSquare & operator[](const Locus &l);
+    const BoardSquare & operator[](const Locus &l) const;
 private:
     static board_t getEmptyBoard(void);
     static BoardSquare & getSquareFromLocus(board_t &b, Locus loc);
