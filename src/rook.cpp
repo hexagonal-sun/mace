@@ -7,11 +7,14 @@ Rook::Rook(Colour col)
 
 std::vector<Board> Rook::getCandidateMoves(Board &b, Locus from) const
 {
-    std::vector<Board> ret;
+    static const PieceMovementSpec rookSpec = {
+        {Direction::NORTH},
+        {Direction::EAST},
+        {Direction::SOUTH},
+        {Direction::WEST}
+    };
 
-    
-
-    return ret;
+    return applyTranslationSpec(b, from, rookSpec, false);
 }
 
 void Rook::printPiece(std::ostream &stream) const
