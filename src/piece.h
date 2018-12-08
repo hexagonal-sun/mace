@@ -32,6 +32,8 @@ static inline Colour getOppositeColour(Colour col)
         return Colour::WHITE;
 }
 
+typedef std::vector<std::vector<Direction>> PieceMovementSpec;
+
 class Board;
 
 class Piece
@@ -44,6 +46,9 @@ public:
     void setSquare(std::shared_ptr<BoardSquare>);
     Colour getColour(void) const;
 protected:
+    std::vector<Board> applyTranslationSpec(Board &b, Locus &from,
+                                            const PieceMovementSpec &ms,
+                                            bool singularTransform) const;
     char formatPieceChar(char pieceName) const;
     std::shared_ptr<BoardSquare> square_;
 private:
