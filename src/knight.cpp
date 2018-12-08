@@ -9,7 +9,7 @@ std::vector<Board> Knight::getCandidateMoves(Board &b, Locus from) const
 {
     std::vector<Board> ret;
 
-    static const std::vector<std::vector<Direction>> translations = {
+    static const PieceMovementSpec knightSpec = {
         {Direction::NORTH, Direction::NORTH, Direction::EAST},
         {Direction::NORTH, Direction::NORTH, Direction::WEST},
         {Direction::EAST, Direction::EAST, Direction::NORTH},
@@ -20,24 +20,7 @@ std::vector<Board> Knight::getCandidateMoves(Board &b, Locus from) const
         {Direction::WEST, Direction::WEST, Direction::SOUTH}
     };
 
-    for (const auto &translation : translations) {
-        auto d = from;
-
-        for (const auto &dir : translation) {
-            try {
-                d = d.translate(dir);
-            } catch (std::domain_error &e) {
-                goto nextTranslation;
-            }
-        }
-
-        if (b.canMoveToSquare(d, getColour()))
-            ret.push_back(b.move(from, d));
-
-    nextTranslation:;
-    }
-
-    return ret;
+    return applyTranslationSpec(b, from, knightSpec, true);
 }
 
 void Knight::printPiece(std::ostream &stream) const
