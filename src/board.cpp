@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <locale>
 #include <iostream>
 #include "board.h"
@@ -55,6 +56,29 @@ Board Board::move(std::string from, std::string to) const
 Board Board::move(Locus from, Locus to) const
 {
     return move(board_.at(from), board_.at(to));
+}
+
+bool Board::validateMove(std::string from, std::string to) const
+{
+    return validateMove(getSquare(from), getSquare(to));
+}
+
+bool Board::validateMove(const BoardSquare & from, const BoardSquare &to) const
+{
+    try {
+        Board candidate = move(from, to);
+
+        const auto &allowedMoves = getAllCandidateMoves();
+
+        if (std::find(allowedMoves.begin(),
+                      allowedMoves.end(),
+                      candidate) == allowedMoves.end())
+            return false;
+        else
+            return true;
+    } catch (std::exception &e) {
+        return false;
+    }
 }
 
 bool Board::operator==(const Board &other) const

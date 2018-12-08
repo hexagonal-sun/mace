@@ -20,6 +20,8 @@ public:
     Board move(const BoardSquare &from, const BoardSquare &to) const;
     Board move(Locus from, Locus to) const;
     bool canMoveToSquare(Locus l, Colour c) const;
+    bool validateMove(std::string from, std::string to) const;
+    bool validateMove(const BoardSquare &from, const BoardSquare &to) const;
     std::vector<Board> getAllCandidateMoves(void) const;
     const BoardSquare & getSquare(std::string name) const;
     void printBoard(std::ostream &stream) const;
