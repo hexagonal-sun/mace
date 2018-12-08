@@ -7,7 +7,14 @@ Bishop::Bishop(Colour col)
 
 std::vector<Board> Bishop::getCandidateMoves(Board &b, Locus from) const
 {
-    return std::vector<Board>();
+    static const PieceMovementSpec bishopSpec = {
+        {Direction::NORTH, Direction::EAST},
+        {Direction::NORTH, Direction::WEST},
+        {Direction::SOUTH, Direction::EAST},
+        {Direction::SOUTH, Direction::WEST}
+    };
+
+    return applyTranslationSpec(b, from, bishopSpec, false);
 }
 
 void Bishop::printPiece(std::ostream &stream) const
