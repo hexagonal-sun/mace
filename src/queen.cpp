@@ -5,9 +5,20 @@ Queen::Queen(Colour col)
 {
 }
 
-std::vector<Board> Queen::getCandidateMoves(Board &b, Locus l) const
+std::vector<Board> Queen::getCandidateMoves(Board &b, Locus from) const
 {
-    return std::vector<Board>();
+    static const PieceMovementSpec queenMovementSpec = {
+        {Direction::NORTH},
+        {Direction::EAST},
+        {Direction::SOUTH},
+        {Direction::WEST},
+        {Direction::NORTH, Direction::EAST},
+        {Direction::NORTH, Direction::WEST},
+        {Direction::SOUTH, Direction::EAST},
+        {Direction::SOUTH, Direction::WEST}
+    };
+
+    return applyTranslationSpec(b, from, queenMovementSpec, false);
 }
 
 void Queen::printPiece(std::ostream &stream) const
