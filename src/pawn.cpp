@@ -5,7 +5,7 @@ Pawn::Pawn(Colour col)
 {
 }
 
-std::vector<Board> Pawn::getCandidateMoves(Board &b, Locus from) const
+std::vector<Board> Pawn::getCandidateMoves(const Board &b, Locus from) const
 {
     const auto dir = getColour() == Colour::WHITE ? Direction::NORTH : Direction::SOUTH;
     const auto startingRank = getColour() == Colour::WHITE ? Rank::TWO : Rank::SEVEN;

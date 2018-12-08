@@ -10,7 +10,7 @@ Colour Piece::getColour(void) const
     return colour_;
 }
 
-std::vector<Board> Piece::applyTranslationSpec(Board &b, Locus &from,
+std::vector<Board> Piece::applyTranslationSpec(const Board &b, Locus &from,
                                                const PieceMovementSpec &ms,
                                                bool singularTransform) const
 {

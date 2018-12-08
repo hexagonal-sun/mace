@@ -5,7 +5,7 @@ Knight::Knight(Colour col)
 {
 }
 
-std::vector<Board> Knight::getCandidateMoves(Board &b, Locus from) const
+std::vector<Board> Knight::getCandidateMoves(const Board &b, Locus from) const
 {
     std::vector<Board> ret;
 

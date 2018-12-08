@@ -40,13 +40,13 @@ class Piece
 {
 public:
     Piece(Colour colour);
-    virtual std::vector<Board> getCandidateMoves(Board &b, Locus l) const = 0;
+    virtual std::vector<Board> getCandidateMoves(const Board &b, Locus l) const = 0;
     virtual void printPiece(std::ostream &stream) const = 0;
     int getValue(void) const;
     void setSquare(std::shared_ptr<BoardSquare>);
     Colour getColour(void) const;
 protected:
-    std::vector<Board> applyTranslationSpec(Board &b, Locus &from,
+    std::vector<Board> applyTranslationSpec(const Board &b, Locus &from,
                                             const PieceMovementSpec &ms,
                                             bool singularTransform) const;
     char formatPieceChar(char pieceName) const;

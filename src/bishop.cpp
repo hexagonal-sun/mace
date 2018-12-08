@@ -5,7 +5,7 @@ Bishop::Bishop(Colour col)
 {
 }
 
-std::vector<Board> Bishop::getCandidateMoves(Board &b, Locus from) const
+std::vector<Board> Bishop::getCandidateMoves(const Board &b, Locus from) const
 {
     static const PieceMovementSpec bishopSpec = {
         {Direction::NORTH, Direction::EAST},
