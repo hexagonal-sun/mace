@@ -45,3 +45,14 @@ std::shared_ptr<Piece> BoardSquare::getPiece(void) const
 
     return piece_;
 }
+
+bool BoardSquare::operator==(const BoardSquare &other) const
+{
+    if (isOccupied_ != other.isOccupied())
+        return false;
+
+    if (!isOccupied_)
+        return true;
+
+    return *getPiece() == *other.getPiece();
+}
