@@ -57,6 +57,11 @@ Board Board::move(Locus from, Locus to) const
     return move(board_.at(from), board_.at(to));
 }
 
+bool Board::operator==(const Board &other) const
+{
+    return board_ == other.board_;
+}
+
 void Board::printBoard(std::ostream &stream) const
 {
     for (const auto rank : RANKS)

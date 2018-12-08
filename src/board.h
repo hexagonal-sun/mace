@@ -24,6 +24,7 @@ public:
     const BoardSquare & getSquare(std::string name) const;
     void printBoard(std::ostream &stream) const;
     const BoardSquare & operator[](const Locus &l) const;
+    bool operator==(const Board& other) const;
 private:
     static board_t getEmptyBoard(void);
     static BoardSquare & getSquareFromLocus(board_t &b, Locus loc);
