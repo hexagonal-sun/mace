@@ -1,0 +1,47 @@
+#include "boardSquare.h"
+#include "piece.h"
+
+BoardSquare::BoardSquare(Rank r, File f)
+    : loc_(Locus(r, f)),
+      isOccupied_(false)
+{
+}
+
+void BoardSquare::setPiece(std::shared_ptr<Piece> piece)
+{
+    piece_ = piece;
+    piece_->setSquare(std::make_shared<BoardSquare>(*this));
+    isOccupied_ = true;
+}
+
+void BoardSquare::setEmpty(void)
+{
+    piece_ = nullptr;
+    isOccupied_ = false;
+}
+
+const Locus BoardSquare::getLocus(void) const
+{
+    return loc_;
+}
+
+bool BoardSquare::isOccupied() const
+{
+    return isOccupied_;
+}
+
+void BoardSquare::printSquare(std::ostream &stream) const
+{
+    if (!isOccupied_)
+        stream << ".";
+    else
+        piece_->printPiece(stream);
+}
+
+std::shared_ptr<Piece> BoardSquare::getPiece(void) const
+{
+    if (!isOccupied_)
+        throw std::domain_error("Attempted to get piece on an empty square");
+
+    return piece_;
+}

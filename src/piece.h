@@ -1,0 +1,52 @@
+#pragma once
+
+#include <vector>
+#include <map>
+#include <ostream>
+#include <memory>
+#include <string>
+#include <locale>
+
+#include "board.h"
+#include "locus.h"
+
+class BoardSquare;
+
+enum class Colour
+{
+    WHITE,
+    BLACK
+};
+
+static const std::map<Colour, std::string> colourNames =
+{
+    {Colour::WHITE, "White"},
+    {Colour::BLACK, "Black"}
+};
+
+static inline Colour getOppositeColour(Colour col)
+{
+    if (col == Colour::WHITE)
+        return Colour::BLACK;
+    else
+        return Colour::WHITE;
+}
+
+class Board;
+
+class Piece
+{
+public:
+    Piece(Colour colour);
+    virtual std::vector<Board> getCandidateMoves(Board &b, Locus l) const = 0;
+    virtual void printPiece(std::ostream &stream) const = 0;
+    int getValue(void) const;
+    void setSquare(std::shared_ptr<BoardSquare>);
+    Colour getColour(void) const;
+protected:
+    char formatPieceChar(char pieceName) const;
+    std::shared_ptr<BoardSquare> square_;
+private:
+    virtual unsigned int getValueMagnitude(void) const = 0;
+    Colour colour_;
+};
