@@ -73,6 +73,11 @@ bool Board::validateMove(std::string from, std::string to) const
     return validateMove(getSquare(from), getSquare(to));
 }
 
+Colour Board::getNextMoveColour(void) const
+{
+    return nextMoveColour_;
+}
+
 const std::vector<Move> &Board::getMoveList(void) const
 {
     return moves_;

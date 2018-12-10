@@ -22,6 +22,7 @@ public:
     bool canMoveToSquare(Locus l, Colour c) const;
     bool validateMove(std::string from, std::string to) const;
     bool validateMove(const BoardSquare &from, const BoardSquare &to) const;
+    Colour getNextMoveColour(void) const;
     const std::vector<Move> &getMoveList(void) const;
     std::vector<Board> getAllCandidateMoves(void) const;
     const BoardSquare & getSquare(std::string name) const;
