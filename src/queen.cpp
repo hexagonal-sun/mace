@@ -30,3 +30,8 @@ unsigned int Queen::getValueMagnitude(void) const
 {
     return 9;
 }
+
+PieceType Queen::getPieceType(void) const
+{
+    return PieceType::QUEEN;
+}

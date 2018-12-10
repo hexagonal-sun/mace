@@ -32,3 +32,8 @@ unsigned int Knight::getValueMagnitude(void) const
 {
     return 3;
 }
+
+PieceType Knight::getPieceType(void) const
+{
+    return PieceType::KNIGHT;
+}

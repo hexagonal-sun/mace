@@ -52,3 +52,8 @@ unsigned int Pawn::getValueMagnitude(void) const
 {
     return 1;
 }
+
+PieceType Pawn::getPieceType(void) const
+{
+    return PieceType::PAWN;
+}

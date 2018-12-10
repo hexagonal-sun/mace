@@ -26,3 +26,8 @@ unsigned int Rook::getValueMagnitude(void) const
 {
     return 5;
 }
+
+PieceType Rook::getPieceType(void) const
+{
+    return PieceType::ROOK;
+}

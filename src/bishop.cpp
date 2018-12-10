@@ -26,3 +26,8 @@ unsigned int Bishop::getValueMagnitude(void) const
 {
     return 3;
 }
+
+PieceType Bishop::getPieceType(void) const
+{
+    return PieceType::BISHOP;
+}

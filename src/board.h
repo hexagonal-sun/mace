@@ -6,8 +6,10 @@
 #include <vector>
 
 #include "boardSquare.h"
+#include "piece.h"
 
 enum class Colour;
+enum class PieceType;
 
 typedef std::unordered_map<Locus, BoardSquare> board_t;
 typedef std::tuple<Locus, Locus> Move;

@@ -9,4 +9,5 @@ public:
     std::vector<Board> getCandidateMoves(const Board &b, Locus l) const;
     void printPiece(std::ostream &stream) const;
     unsigned int getValueMagnitude(void) const;
+    PieceType getPieceType(void) const;
 };

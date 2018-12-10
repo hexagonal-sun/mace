@@ -18,6 +18,16 @@ enum class Colour
     BLACK
 };
 
+enum class PieceType
+{
+    PAWN,
+    KING,
+    QUEEN,
+    BISHOP,
+    KNIGHT,
+    ROOK
+};
+
 static const std::map<Colour, std::string> colourNames =
 {
     {Colour::WHITE, "White"},
@@ -42,6 +52,7 @@ public:
     Piece(Colour colour);
     virtual std::vector<Board> getCandidateMoves(const Board &b, Locus l) const = 0;
     virtual void printPiece(std::ostream &stream) const = 0;
+    virtual PieceType getPieceType(void) const  = 0;
     int getValue(void) const;
     bool canMoveToSquare(const Board &b, Locus l, Colour c) const;
     void setSquare(std::shared_ptr<BoardSquare>);

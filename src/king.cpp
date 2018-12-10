@@ -30,3 +30,8 @@ unsigned int King::getValueMagnitude(void) const
 {
     return 1024;
 }
+
+PieceType King::getPieceType(void) const
+{
+    return PieceType::KING;
+}
