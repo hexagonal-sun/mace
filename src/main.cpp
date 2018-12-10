@@ -1,5 +1,6 @@
 #include <iostream>
 #include "board.h"
+#include "search.h"
 
 int main()
 {
@@ -8,7 +9,6 @@ int main()
     while (1)
     {
         b.printBoard(std::cout);
-        b.getAllCandidateMoves();
 
         std::string from;
         std::string to;
@@ -18,8 +18,22 @@ int main()
             return 0;
         std::cout << "To: ";
         std::cin >> to;
+        std::cout << "\n";
+
+        if (!b.validateMove(from, to)) {
+            std::cout << "Invalid move\n";
+            continue;
+        }
 
         b = b.move(from, to);
+
+        std::cout << "Thinking....\n";
+
+        Move m = searchMove(b, 5);
+
+        std::cout << "My move: " << std::get<0>(m) << std::get<1>(m) << "\n";
+
+        b = b.move(std::get<0>(m), std::get<1>(m));
     }
 
     return 0;
