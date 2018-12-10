@@ -14,7 +14,6 @@ typedef std::unordered_map<Locus, BoardSquare> board_t;
 class Board
 {
 public:
-    Board(board_t b, Colour nextMoveColour);
     static Board getStartingBoard(void);
     Board move(std::string from, std::string to) const;
     Board move(const BoardSquare &from, const BoardSquare &to) const;
@@ -28,6 +27,7 @@ public:
     const BoardSquare & operator[](const Locus &l) const;
     bool operator==(const Board& other) const;
 private:
+    Board(board_t b, Colour nextMoveColour);
     static board_t getEmptyBoard(void);
     static BoardSquare & getSquareFromLocus(board_t &b, Locus loc);
     void evaluatePosition(void);
