@@ -16,6 +16,12 @@ Board::Board(board_t b, Colour nextMoveColour)
     evaluatePosition();
 }
 
+Board::Board(board_t b, Colour nextMoveColour, std::vector<Move> m)
+    : board_(b), nextMoveColour_(nextMoveColour), moves_(m), evaluation_(0)
+{
+    evaluatePosition();
+}
+
 const BoardSquare & Board::getSquare(std::string name) const
 {
     if (name.length() != 2)
@@ -39,13 +45,17 @@ Board Board::move(const BoardSquare &from, const BoardSquare &to) const
         throw std::invalid_argument("Attempted to move the opposite turn's piece.");
 
     board_t newBoard = board_;
+    auto moves = getMoveList();
 
     const auto fromLoc = from.getLocus();
     const auto toLoc = to.getLocus();
     newBoard.at(toLoc).setPiece(newBoard.at(fromLoc).getPiece());
     newBoard.at(fromLoc).setEmpty();
 
-    return Board(newBoard, getOppositeColour(nextMoveColour_));
+    moves.push_back(std::make_tuple(from.getLocus(), to.getLocus()));
+
+    return Board(newBoard, getOppositeColour(nextMoveColour_),
+                 moves);
 }
 
 Board Board::move(std::string from, std::string to) const
@@ -61,6 +71,11 @@ Board Board::move(Locus from, Locus to) const
 bool Board::validateMove(std::string from, std::string to) const
 {
     return validateMove(getSquare(from), getSquare(to));
+}
+
+const std::vector<Move> &Board::getMoveList(void) const
+{
+    return moves_;
 }
 
 bool Board::validateMove(const BoardSquare & from, const BoardSquare &to) const
