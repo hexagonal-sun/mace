@@ -137,20 +137,6 @@ const int Board::getEvaluation(void) const
     return evaluation_;
 }
 
-bool Board::canMoveToSquare(Locus l, Colour c) const
-{
-    const auto &sq = board_.at(l);
-
-    if (!sq.isOccupied())
-        return true;
-
-    // We can take opposite coloured pieces.
-    if (sq.getPiece()->getColour() != c)
-        return true;
-
-    return false;
-}
-
 const BoardSquare & Board::operator[](const Locus &l) const
 {
     return board_.at(l);

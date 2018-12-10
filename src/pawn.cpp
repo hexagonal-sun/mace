@@ -13,14 +13,14 @@ std::vector<Board> Pawn::getCandidateMoves(const Board &b, Locus from) const
 
     auto newLoc = from.translate(dir);
 
-    if (b.canMoveToSquare(newLoc, getColour())) {
+    if (canMoveToSquare(b, newLoc, getColour())) {
         ret.push_back(b.move(from, newLoc));
 
         // We can only move a pawn forward two squares if it isn't
         // obstructed at `newLoc' and it's on it's starting rank.
         if (from.getRank() == startingRank) {
             auto doubleMove = newLoc.translate(dir);
-            if (b.canMoveToSquare(doubleMove, getColour()))
+            if (canMoveToSquare(b, doubleMove, getColour()))
                 ret.push_back(b.move(from, doubleMove));
         }
     }
