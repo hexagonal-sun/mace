@@ -132,6 +132,11 @@ void Board::evaluatePosition(void)
     }
 }
 
+const int Board::getEvaluation(void) const
+{
+    return evaluation_;
+}
+
 bool Board::canMoveToSquare(Locus l, Colour c) const
 {
     const auto &sq = board_.at(l);
