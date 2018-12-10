@@ -16,7 +16,8 @@ static bval alphaBeta(const Board &node, size_t depth,
 
     if (maximizePlayer) {
         bval val = std::make_tuple(-INT_MAX, nullptr);
-        for (const auto &child : node.getAllCandidateMoves()) {
+        for (const auto &move : node.getAllCandidateMoves()) {
+            const auto child = node.move(move);
             val = std::max(val, alphaBeta(child, depth - 1,
                                           alpha, beta, false));
             alpha = std::max(alpha, val);
@@ -26,7 +27,8 @@ static bval alphaBeta(const Board &node, size_t depth,
         return val;
     } else {
         bval val = std::make_tuple(INT_MAX, nullptr);
-        for (const auto &child : node.getAllCandidateMoves()) {
+        for (const auto &move : node.getAllCandidateMoves()) {
+            const auto child = node.move(move);
             val = std::min(val, alphaBeta(child, depth - 1,
                                           alpha, beta, true));
             beta = std::min(beta, val);

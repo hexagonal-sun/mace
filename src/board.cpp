@@ -68,9 +68,14 @@ Board Board::move(Locus from, Locus to) const
     return move(board_.at(from), board_.at(to));
 }
 
+Board Board::move(Move m) const
+{
+    return move(board_.at(std::get<0>(m)), board_.at(std::get<1>(m)));
+}
+
 bool Board::validateMove(std::string from, std::string to) const
 {
-    return validateMove(getSquare(from), getSquare(to));
+    return validateMove(getSquare(from).getLocus(), getSquare(to).getLocus());
 }
 
 Colour Board::getNextMoveColour(void) const
@@ -83,22 +88,18 @@ const std::vector<Move> &Board::getMoveList(void) const
     return moves_;
 }
 
-bool Board::validateMove(const BoardSquare & from, const BoardSquare &to) const
+bool Board::validateMove(const Locus & from, const Locus &to) const
 {
-    try {
-        Board candidate = move(from, to);
+    auto candidate = std::make_tuple(from, to);
 
-        const auto &allowedMoves = getAllCandidateMoves();
+    const auto &allowedMoves = getAllCandidateMoves();
 
-        if (std::find(allowedMoves.begin(),
-                      allowedMoves.end(),
-                      candidate) == allowedMoves.end())
-            return false;
-        else
-            return true;
-    } catch (std::exception &e) {
+    if (std::find(allowedMoves.begin(),
+                  allowedMoves.end(),
+                  candidate) == allowedMoves.end())
         return false;
-    }
+    else
+        return true;
 }
 
 bool Board::operator==(const Board &other) const
@@ -123,6 +124,22 @@ void Board::printBoard(std::ostream &stream) const
     stream << "Evaluation: " << evaluation_ << "\n";
 }
 
+std::vector<Locus> Board::locatePiece(Colour c, PieceType t) const
+{
+    std::vector<Locus> ret;
+
+    for (const auto &posSquare : board_) {
+        const auto &square = posSquare.second;
+
+        if (square.isOccupied() &&
+            square.getPiece()->getColour() == c &&
+            square.getPiece()->getPieceType() == t)
+            ret.push_back(posSquare.first);
+    }
+
+    return ret;
+}
+
 void Board::evaluatePosition(void)
 {
     for (const auto &posSquare : board_) {
@@ -142,9 +159,9 @@ const BoardSquare & Board::operator[](const Locus &l) const
     return board_.at(l);
 }
 
-std::vector<Board> Board::getAllCandidateMoves(void) const
+std::vector<Move> Board::getAllCandidateMoves(void) const
 {
-    std::vector<Board> ret;
+    std::vector<Move> ret;
 
     for (const auto &posSquare : board_) {
         auto square = posSquare.second;

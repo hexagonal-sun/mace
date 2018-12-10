@@ -5,7 +5,7 @@ King::King(Colour col)
 {
 }
 
-std::vector<Board> King::getCandidateMoves(const Board &b, Locus from) const
+std::vector<Move> King::getCandidateMoves(const Board &b, Locus from) const
 {
     static const PieceMovementSpec kingMovementSpec = {
         {Direction::NORTH},

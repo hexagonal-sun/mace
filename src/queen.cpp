@@ -5,7 +5,7 @@ Queen::Queen(Colour col)
 {
 }
 
-std::vector<Board> Queen::getCandidateMoves(const Board &b, Locus from) const
+std::vector<Move> Queen::getCandidateMoves(const Board &b, Locus from) const
 {
     static const PieceMovementSpec queenMovementSpec = {
         {Direction::NORTH},

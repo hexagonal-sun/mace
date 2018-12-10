@@ -45,12 +45,13 @@ static inline Colour getOppositeColour(Colour col)
 typedef std::vector<std::vector<Direction>> PieceMovementSpec;
 
 class Board;
+typedef std::tuple<Locus, Locus> Move;
 
 class Piece
 {
 public:
     Piece(Colour colour);
-    virtual std::vector<Board> getCandidateMoves(const Board &b, Locus l) const = 0;
+    virtual std::vector<Move> getCandidateMoves(const Board &b, Locus l) const = 0;
     virtual void printPiece(std::ostream &stream) const = 0;
     virtual PieceType getPieceType(void) const  = 0;
     int getValue(void) const;
@@ -59,9 +60,9 @@ public:
     Colour getColour(void) const;
     bool operator==(const Piece &other) const;
 protected:
-    std::vector<Board> applyTranslationSpec(const Board &b, Locus &from,
-                                            const PieceMovementSpec &ms,
-                                            bool singularTransform) const;
+    std::vector<Move> applyTranslationSpec(const Board &b, Locus &from,
+                                           const PieceMovementSpec &ms,
+                                           bool singularTransform) const;
     char formatPieceChar(char pieceName) const;
     std::shared_ptr<BoardSquare> square_;
 private:

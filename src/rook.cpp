@@ -5,7 +5,7 @@ Rook::Rook(Colour col)
 {
 }
 
-std::vector<Board> Rook::getCandidateMoves(const Board &b, Locus from) const
+std::vector<Move> Rook::getCandidateMoves(const Board &b, Locus from) const
 {
     static const PieceMovementSpec rookSpec = {
         {Direction::NORTH},

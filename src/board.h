@@ -21,12 +21,13 @@ public:
     Board move(std::string from, std::string to) const;
     Board move(const BoardSquare &from, const BoardSquare &to) const;
     Board move(Locus from, Locus to) const;
+    Board move(Move m) const;
     bool validateMove(std::string from, std::string to) const;
-    bool validateMove(const BoardSquare &from, const BoardSquare &to) const;
+    bool validateMove(const Locus &from, const Locus &to) const;
     Colour getNextMoveColour(void) const;
     const std::vector<Move> &getMoveList(void) const;
     const int getEvaluation(void) const;
-    std::vector<Board> getAllCandidateMoves(void) const;
+    std::vector<Move> getAllCandidateMoves(void) const;
     const BoardSquare & getSquare(std::string name) const;
     void printBoard(std::ostream &stream) const;
     const BoardSquare & operator[](const Locus &l) const;
@@ -36,6 +37,7 @@ private:
     Board(board_t b, Colour nextMoveColour);
     static board_t getEmptyBoard(void);
     static BoardSquare & getSquareFromLocus(board_t &b, Locus loc);
+    std::vector<Locus> locatePiece(Colour c, PieceType t) const;
     void evaluatePosition(void);
     std::vector<Move> moves_;
     int evaluation_;

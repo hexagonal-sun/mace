@@ -10,11 +10,11 @@ Colour Piece::getColour(void) const
     return colour_;
 }
 
-std::vector<Board> Piece::applyTranslationSpec(const Board &b, Locus &from,
-                                               const PieceMovementSpec &ms,
-                                               bool singularTransform) const
+std::vector<Move> Piece::applyTranslationSpec(const Board &b, Locus &from,
+                                              const PieceMovementSpec &ms,
+                                              bool singularTransform) const
 {
-    std::vector<Board> ret;
+    std::vector<Move> ret;
 
     for (const auto &dirs : ms)
     {
@@ -28,7 +28,7 @@ std::vector<Board> Piece::applyTranslationSpec(const Board &b, Locus &from,
             }
 
             if (canMoveToSquare(b, l, getColour())) {
-                ret.push_back(b.move(from, l));
+                ret.push_back(std::make_tuple(from, l));
                 if (singularTransform)
                     goto nextDir;
             } else
