@@ -140,6 +140,21 @@ std::vector<Locus> Board::locatePiece(Colour c, PieceType t) const
     return ret;
 }
 
+bool Board::isPieceUnderAttack(Locus l) const
+{
+    const auto &pieceColour = board_.at(l).getPiece()->getColour();
+
+    for (const auto &posSquare : board_)
+        if (posSquare.second.isOccupied() &&
+            posSquare.second.getPiece()->getColour() == getOppositeColour(pieceColour))
+            for (const auto move : posSquare.second.getPiece()->getCandidateMoves(*this,
+                                                                                  posSquare.first))
+                if (std::get<1>(move) == l)
+                    return true;
+
+    return false;
+}
+
 void Board::evaluatePosition(void)
 {
     for (const auto &posSquare : board_) {

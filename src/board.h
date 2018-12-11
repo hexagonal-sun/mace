@@ -35,6 +35,7 @@ public:
 private:
     Board(board_t b, Colour nextMoveColour, std::vector<Move> move);
     Board(board_t b, Colour nextMoveColour);
+    bool isPieceUnderAttack(Locus l) const;
     static board_t getEmptyBoard(void);
     static BoardSquare & getSquareFromLocus(board_t &b, Locus loc);
     std::vector<Locus> locatePiece(Colour c, PieceType t) const;
