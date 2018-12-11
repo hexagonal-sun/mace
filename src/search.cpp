@@ -1,53 +1,68 @@
 #include <iostream>
 #include <climits>
 
+#include "mover.hpp"
 #include "search.h"
 #include "piece.h"
 
-typedef std::tuple<int, std::shared_ptr<Board>> bval;
+static int alphaBeta(Board &node, size_t depth,
+                     int alpha, int beta,
+                     bool maximizePlayer,
+                     Move *bestMove)
 
-static bval alphaBeta(const Board &node, size_t depth,
-                      bval alpha, bval beta,
-                      bool maximizePlayer)
 {
     if (depth == 0)
-        return std::make_tuple(node.getEvaluation(),
-                               std::make_shared<Board>(node));
+        return node.getEvaluation();
 
     if (maximizePlayer) {
-        bval val = std::make_tuple(-INT_MAX, nullptr);
-        for (const auto &move : node.getAllCandidateMoves()) {
-            const auto child = node.move(move);
-            val = std::max(val, alphaBeta(child, depth - 1,
-                                          alpha, beta, false));
+        int val = -INT_MAX;
+
+        for (const auto move : node.getAllCandidateMoves()) {
+            Mover m(move, node);
+            int prevAlpha = alpha;
+
+            val = std::max(val, alphaBeta(node, depth - 1,
+                                          alpha, beta, false, nullptr));
             alpha = std::max(alpha, val);
-            if (std::get<0>(alpha) >= std::get<0>(beta))
+
+            if (bestMove && alpha != prevAlpha)
+                *bestMove = move;
+
+            if (alpha >= beta)
                 break;
         }
         return val;
     } else {
-        bval val = std::make_tuple(INT_MAX, nullptr);
-        for (const auto &move : node.getAllCandidateMoves()) {
-            const auto child = node.move(move);
-            val = std::min(val, alphaBeta(child, depth - 1,
-                                          alpha, beta, true));
+        int val = INT_MAX;
+
+        for (const auto move : node.getAllCandidateMoves()) {
+            Mover m(move, node);
+            int prevBeta = beta;
+
+            val = std::min(val, alphaBeta(node, depth - 1,
+                                          alpha, beta, true, nullptr));
             beta = std::min(beta, val);
-            if (std::get<0>(alpha) >= std::get<0>(beta))
+
+            if (bestMove && beta != prevBeta)
+                *bestMove = move;
+
+            if (alpha >= beta)
                 break;
         }
         return val;
     }
 }
 
-Move searchMove(const Board &b, size_t depth)
+Move searchMove(Board &b, size_t depth)
 {
-    size_t moveNumber = b.getMoveList().size();
+    int alpha = -INT_MAX;
+    int beta = INT_MAX;
 
-    bval alpha = std::make_tuple(-INT_MAX, nullptr);
-    bval beta = std::make_tuple(INT_MAX, nullptr);
+    Move m(Locus('1', 'a'), Locus('1', 'a'));
 
-    bval result = alphaBeta(b, depth, alpha, beta,
-                            b.getNextMoveColour() == Colour::WHITE ? true : false);
+    int result = alphaBeta(b, depth, alpha, beta,
+                           b.getNextMoveColour() == Colour::WHITE ? true : false,
+                           &m);
 
-    return std::get<1>(result)->getMoveList().at(moveNumber);
+    return m;
 }

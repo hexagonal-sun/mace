@@ -11,15 +11,8 @@
 #include "boardSquare.h"
 
 Board::Board(board_t b, Colour nextMoveColour)
-    : board_(b), nextMoveColour_(nextMoveColour), evaluation_(0)
+    : board_(b), nextMoveColour_(nextMoveColour)
 {
-    evaluatePosition();
-}
-
-Board::Board(board_t b, Colour nextMoveColour, std::vector<Move> m)
-    : board_(b), nextMoveColour_(nextMoveColour), moves_(m), evaluation_(0)
-{
-    evaluatePosition();
 }
 
 const BoardSquare & Board::getSquare(std::string name) const
@@ -33,52 +26,17 @@ const BoardSquare & Board::getSquare(std::string name) const
     return board_.at(Locus(rank, file));
 }
 
-Board Board::move(const BoardSquare &from, const BoardSquare &to) const
-{
-    // Some basic sanity checks here...
-    if (!from.isOccupied())
-        throw std::invalid_argument("Attempted to move from an empty square");
-
-    auto piece = from.getPiece();
-
-    if (piece->getColour() != nextMoveColour_)
-        throw std::invalid_argument("Attempted to move the opposite turn's piece.");
-
-    board_t newBoard = board_;
-    auto moves = getMoveList();
-
-    const auto fromLoc = from.getLocus();
-    const auto toLoc = to.getLocus();
-    newBoard.at(toLoc).setPiece(newBoard.at(fromLoc).getPiece());
-    newBoard.at(fromLoc).setEmpty();
-
-    moves.push_back(std::make_tuple(from.getLocus(), to.getLocus()));
-
-    return Board(newBoard, getOppositeColour(nextMoveColour_),
-                 moves);
-}
-
-Board Board::move(std::string from, std::string to) const
-{
-    return move(getSquare(from), getSquare(to));
-}
-
-Board Board::move(Locus from, Locus to) const
-{
-    return move(board_.at(from), board_.at(to));
-}
-
-Board Board::move(Move m) const
-{
-    return move(board_.at(std::get<0>(m)), board_.at(std::get<1>(m)));
-}
-
 bool Board::validateMove(std::string from, std::string to) const
 {
     return validateMove(getSquare(from).getLocus(), getSquare(to).getLocus());
 }
 
-Colour Board::getNextMoveColour(void) const
+const Colour Board::getNextMoveColour(void) const
+{
+    return nextMoveColour_;
+}
+
+Colour & Board::getNextMoveColour(void)
 {
     return nextMoveColour_;
 }
@@ -121,7 +79,6 @@ void Board::printBoard(std::ostream &stream) const
     }
 
     stream << "To move: " << colourNames.at(nextMoveColour_) << "\n";
-    stream << "Evaluation: " << evaluation_ << "\n";
 }
 
 std::vector<Locus> Board::locatePiece(Colour c, PieceType t) const
@@ -155,21 +112,26 @@ bool Board::isPieceUnderAttack(Locus l) const
     return false;
 }
 
-void Board::evaluatePosition(void)
-{
-    for (const auto &posSquare : board_) {
-        auto square = posSquare.second;
-        if (square.isOccupied())
-            evaluation_ += square.getPiece()->getValue();
-    }
-}
 
 const int Board::getEvaluation(void) const
 {
-    return evaluation_;
+    int eval = 0;
+
+    for (const auto &posSquare : board_) {
+        auto square = posSquare.second;
+        if (square.isOccupied())
+            eval += square.getPiece()->getValue();
+    }
+
+    return eval;
 }
 
 const BoardSquare & Board::operator[](const Locus &l) const
+{
+    return board_.at(l);
+}
+
+BoardSquare & Board::operator[](const Locus &l)
 {
     return board_.at(l);
 }

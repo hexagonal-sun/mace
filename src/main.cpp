@@ -1,6 +1,7 @@
 #include <iostream>
 #include "board.h"
 #include "search.h"
+#include "mover.hpp"
 
 int main()
 {
@@ -25,15 +26,14 @@ int main()
             continue;
         }
 
-        b = b.move(from, to);
+        Move m = {Locus(from[1], from[0]), Locus(to[1], to[0])};
+        Mover a(m, b);
 
         std::cout << "Thinking....\n";
 
-        Move m = searchMove(b, 5);
+        Move bestMove = searchMove(b, 5);
 
-        std::cout << "My move: " << std::get<0>(m) << std::get<1>(m) << "\n";
-
-        b = b.move(std::get<0>(m), std::get<1>(m));
+        std::cout << "My move: " << std::get<0>(bestMove) << std::get<1>(bestMove) << "\n";
     }
 
     return 0;
