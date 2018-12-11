@@ -74,3 +74,9 @@ bool Piece::operator==(const Piece &other) const
 
     return getColour() == other.getColour();
 }
+
+std::ostream &operator<<(std::ostream &o, const Move &m)
+{
+    o << std::get<0>(m) << std::get<1>(m);
+    return o;
+}

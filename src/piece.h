@@ -47,6 +47,8 @@ typedef std::vector<std::vector<Direction>> PieceMovementSpec;
 class Board;
 typedef std::tuple<Locus, Locus> Move;
 
+std::ostream &operator<<(std::ostream &o, const Move &m);
+
 class Piece
 {
 public:
