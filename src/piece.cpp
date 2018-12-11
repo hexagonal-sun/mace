@@ -27,11 +27,15 @@ std::vector<Move> Piece::applyTranslationSpec(const Board &b, Locus &from,
                 goto nextDir;
             }
 
-            if (canMoveToSquare(b, l, getColour())) {
-                ret.push_back(std::make_tuple(from, l));
-                if (singularTransform)
-                    goto nextDir;
-            } else
+            auto squareType = b[l].getSquareType(getColour());
+
+            if (squareType == SquareType::OCCUPIED)
+                goto nextDir;
+
+            ret.push_back(std::make_tuple(from, l));
+
+            if (singularTransform ||
+                squareType == SquareType::TAKE)
                 goto nextDir;
         }
     nextDir:;
@@ -69,18 +73,4 @@ bool Piece::operator==(const Piece &other) const
         return false;
 
     return getColour() == other.getColour();
-}
-
-bool Piece::canMoveToSquare(const Board &b, Locus l, Colour c) const
-{
-    const auto &sq = b[l];
-
-    if (!sq.isOccupied())
-        return true;
-
-    // We can take opposite coloured pieces
-    if (sq.getPiece()->getColour() != c)
-        return true;
-
-    return false;
 }

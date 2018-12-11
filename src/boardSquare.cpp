@@ -56,3 +56,15 @@ bool BoardSquare::operator==(const BoardSquare &other) const
 
     return *getPiece() == *other.getPiece();
 }
+
+SquareType BoardSquare::getSquareType(Colour c) const
+{
+    if (!isOccupied())
+        return SquareType::EMPTY;
+
+    // We can take opposite coloured pieces
+    if (getPiece()->getColour() != c)
+        return SquareType::TAKE;
+
+    return SquareType::OCCUPIED;
+}

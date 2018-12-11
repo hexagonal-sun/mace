@@ -5,6 +5,14 @@
 #include "locus.h"
 
 class Piece;
+enum class Colour;
+
+enum class SquareType
+{
+    EMPTY,
+    TAKE,
+    OCCUPIED
+};
 
 class BoardSquare
 {
@@ -14,6 +22,7 @@ public:
     void setEmpty(void);
     bool isOccupied() const;
     const Locus getLocus(void) const;
+    SquareType getSquareType(Colour c) const;
     void printSquare(std::ostream &stream) const;
     std::shared_ptr<Piece> getPiece(void) const;
     bool operator==(const BoardSquare &other) const;
