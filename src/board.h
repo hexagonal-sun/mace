@@ -14,7 +14,7 @@ enum class PieceType;
 
 typedef std::unordered_map<Locus, BoardSquare> board_t;
 typedef std::tuple<Locus, Locus> Move;
-typedef std::function<void(const std::vector<Move> &)> moveCallback_t;
+typedef std::function<bool(const std::vector<Move> &)> moveCallback_t;
 
 class Board
 {

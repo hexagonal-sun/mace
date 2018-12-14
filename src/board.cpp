@@ -151,6 +151,8 @@ std::vector<Move> Board::getAllCandidateMoves(void)
     const auto nonCheckCallback = [&](const std::vector<Move> &moves)
     {
         ret.insert(ret.end(), moves.begin(), moves.end());
+
+        return true;
     };
 
     const auto checkCallback = [&](const std::vector<Move> &moves)
@@ -162,6 +164,8 @@ std::vector<Move> Board::getAllCandidateMoves(void)
             if (!isInCheck(ourColour))
                 ret.push_back(move);
         }
+
+        return true;
     };
 
     if (isInCheck(getNextMoveColour()))
@@ -196,7 +200,8 @@ void Board::forEachPieceMoves(Colour c, moveCallback_t callback) const
             square.getPiece()->getColour() == c) {
             const auto pieceMoves = square.getPiece()->getCandidateMoves(*this,
                                                                          posSquare.first);
-            callback(pieceMoves);
+            if (!callback(pieceMoves))
+                return;
         }
     }
 }
