@@ -32,6 +32,7 @@ public:
     void printBoard(std::ostream &stream) const;
     const BoardSquare & operator[](const Locus &l) const;
     BoardSquare & operator[](const Locus &l);
+    int perft(int depth);
     bool operator==(const Board& other) const;
 private:
     Board(board_t b, Colour nextMoveColour);

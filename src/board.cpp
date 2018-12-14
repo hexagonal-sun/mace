@@ -172,6 +172,22 @@ std::vector<Move> Board::getAllCandidateMoves(void)
     return ret;
 }
 
+int Board::perft(int depth)
+{
+    if (!depth)
+        return 1;
+
+    int nodes = 0;
+
+    for (const auto move : getAllCandidateMoves()) {
+        Mover m(move, *this);
+
+        nodes += perft(depth - 1);
+    }
+
+    return nodes;
+}
+
 void Board::forEachPieceMoves(Colour c, moveCallback_t callback) const
 {
     for (const auto &posSquare : board_) {

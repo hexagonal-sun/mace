@@ -7,6 +7,9 @@ int main()
 {
     Board b = Board::getStartingBoard();
 
+    for (const auto i : {0, 1, 2, 3, 4})
+        std::cout << "pertft(" << i << "): " << b.perft(i) << "\n";
+
     while (1)
     {
         b.printBoard(std::cout);
