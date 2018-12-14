@@ -24,6 +24,11 @@ static const std::unordered_map<char, File> fileNames {
 };
 
 
+Locus::Locus()
+    : loc_(std::make_tuple(Rank::ONE, File::A))
+{
+}
+
 Locus::Locus(Rank r, File f)
     : loc_(std::make_tuple(r, f))
 {
@@ -58,6 +63,11 @@ Rank Locus::getRank(void) const
 File Locus::getFile(void) const
 {
     return std::get<1>(loc_);
+}
+
+size_t Locus::getIndex(void) const
+{
+    return static_cast<size_t>(getRank()) + (static_cast<int>(getFile()) << 3);
 }
 
 Locus Locus::translate(Direction d) const

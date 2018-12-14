@@ -2,17 +2,17 @@
 #include <array>
 #include <memory>
 #include <ostream>
-#include <unordered_map>
+#include <array>
 #include <functional>
 #include <vector>
 
 #include "boardSquare.h"
+#include "chessBoard.h"
 #include "piece.h"
 
 enum class Colour;
 enum class PieceType;
 
-typedef std::unordered_map<Locus, BoardSquare> board_t;
 typedef std::tuple<Locus, Locus> Move;
 typedef std::function<bool(std::shared_ptr<Piece> piece,
                            const std::vector<Move> &)> moveCallback_t;
@@ -34,15 +34,12 @@ public:
     const BoardSquare & operator[](const Locus &l) const;
     BoardSquare & operator[](const Locus &l);
     int perft(int depth);
-    bool operator==(const Board& other) const;
 private:
-    Board(board_t b, Colour nextMoveColour);
+    Board(Colour nextMoveColour);
     void forEachPieceMoves(Colour c, moveCallback_t callback) const;
     bool isPieceUnderAttack(Locus l) const;
-    static board_t getEmptyBoard(void);
-    static BoardSquare & getSquareFromLocus(board_t &b, Locus loc);
     std::vector<Locus> locatePiece(Colour c, PieceType t) const;
     std::vector<Move> moves_;
     Colour nextMoveColour_;
-    board_t board_;
+    ChessBoard board_;
 };

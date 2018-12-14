@@ -4,25 +4,25 @@
 #include <tuple>
 
 enum class Rank {
-    ONE,
-    TWO,
-    THREE,
-    FOUR,
-    FIVE,
-    SIX,
-    SEVEN,
-    EIGHT
+    ONE   = 0,
+    TWO   = 1,
+    THREE = 2,
+    FOUR  = 3,
+    FIVE  = 4,
+    SIX   = 5,
+    SEVEN = 6,
+    EIGHT = 7
 };
 
 enum class File {
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G,
-    H
+    A = 0,
+    B = 1,
+    C = 2,
+    D = 3,
+    E = 4,
+    F = 5,
+    G = 6,
+    H = 7
 };
 
 enum class Direction {
@@ -48,9 +48,11 @@ static const std::vector<File> FILES =
 class Locus
 {
 public:
+    Locus();
     Locus(Rank r, File f);
     Locus(char rank, char file);
     void print(std::ostream &o) const;
+    size_t getIndex(void) const;
     Rank getRank(void) const;
     File getFile(void) const;
     Locus translate(Direction d) const;
@@ -60,16 +62,3 @@ private:
 };
 
 std::ostream &operator<<(std::ostream &os, const Locus &l);
-
-namespace std
-{
-    template <>
-    struct hash<Locus>
-    {
-        size_t operator()(const Locus &locus) const
-        {
-            return hash<Rank>()(locus.getRank()) &
-                hash<File>()(locus.getFile()) << 4;
-        }
-    };
-}

@@ -11,8 +11,8 @@
 #include "boardSquare.h"
 #include "mover.hpp"
 
-Board::Board(board_t b, Colour nextMoveColour)
-    : board_(b), nextMoveColour_(nextMoveColour)
+Board::Board(Colour nextMoveColour)
+    : nextMoveColour_(nextMoveColour)
 {
 }
 
@@ -61,11 +61,6 @@ bool Board::validateMove(const Locus & from, const Locus &to)
         return true;
 }
 
-bool Board::operator==(const Board &other) const
-{
-    return board_ == other.board_;
-}
-
 void Board::printBoard(std::ostream &stream) const
 {
     for (const auto rank : RANKS)
@@ -86,13 +81,11 @@ std::vector<Locus> Board::locatePiece(Colour c, PieceType t) const
 {
     std::vector<Locus> ret;
 
-    for (const auto &posSquare : board_) {
-        const auto &square = posSquare.second;
-
+    for (const auto &square : board_) {
         if (square.isOccupied() &&
             square.getPiece()->getColour() == c &&
             square.getPiece()->getPieceType() == t)
-            ret.push_back(posSquare.first);
+            ret.push_back(square.getLocus());
     }
 
     return ret;
@@ -131,8 +124,7 @@ const int Board::getEvaluation(void) const
 {
     int eval = 0;
 
-    for (const auto &posSquare : board_) {
-        auto square = posSquare.second;
+    for (const auto &square : board_) {
         if (square.isOccupied())
             eval += square.getPiece()->getValue();
     }
@@ -147,7 +139,7 @@ const BoardSquare & Board::operator[](const Locus &l) const
 
 BoardSquare & Board::operator[](const Locus &l)
 {
-    return board_.at(l);
+    return board_[l];
 }
 
 std::vector<Move> Board::getAllCandidateMoves(void)
@@ -208,12 +200,11 @@ int Board::perft(int depth)
 
 void Board::forEachPieceMoves(Colour c, moveCallback_t callback) const
 {
-    for (const auto &posSquare : board_) {
-        auto square = posSquare.second;
+    for (const auto &square : board_) {
         if (square.isOccupied() &&
             square.getPiece()->getColour() == c) {
             const auto pieceMoves = square.getPiece()->getCandidateMoves(*this,
-                                                                         posSquare.first);
+                                                                         square.getLocus());
             if (!callback(square.getPiece(), pieceMoves))
                 return;
         }
@@ -221,39 +212,29 @@ void Board::forEachPieceMoves(Colour c, moveCallback_t callback) const
 }
 
 
-board_t Board::getEmptyBoard()
-{
-    board_t ret;
-    for (const auto rank : RANKS)
-        for (const auto file : FILES)
-            ret.insert({Locus(rank, file), BoardSquare(rank, file)});
-
-    return ret;
-}
-
 Board Board::getStartingBoard()
 {
-    board_t board = getEmptyBoard();
+    Board board(Colour::WHITE);
 
     for (const auto file : FILES) {
-        board.at(Locus(Rank::SEVEN, file)).setPiece(std::make_shared<Pawn>(Pawn(Colour::BLACK)));
-        board.at(Locus(Rank::TWO, file)).setPiece(std::make_shared<Pawn>(Pawn(Colour::WHITE)));
+        board[Locus(Rank::SEVEN, file)].setPiece(std::make_shared<Pawn>(Pawn(Colour::BLACK)));
+        board[Locus(Rank::TWO, file)].setPiece(std::make_shared<Pawn>(Pawn(Colour::WHITE)));
     }
 
     for (const auto col : {Colour::WHITE, Colour::BLACK}) {
         auto rank = col == Colour::WHITE ? Rank::ONE : Rank::EIGHT;
         for (const auto file : {File::A, File::H})
-            board.at(Locus(rank, file)).setPiece(std::make_shared<Rook>(Rook(col)));
+            board[Locus(rank, file)].setPiece(std::make_shared<Rook>(Rook(col)));
 
         for (const auto file : {File::B, File::G})
-            board.at(Locus(rank, file)).setPiece(std::make_shared<Knight>(Knight(col)));
+            board[Locus(rank, file)].setPiece(std::make_shared<Knight>(Knight(col)));
 
         for (const auto file : {File::C, File::F})
-            board.at(Locus(rank, file)).setPiece(std::make_shared<Bishop>(Bishop(col)));
+            board[Locus(rank, file)].setPiece(std::make_shared<Bishop>(Bishop(col)));
 
-        board.at(Locus(rank, File::D)).setPiece(std::make_shared<Queen>(Queen(col)));
-        board.at(Locus(rank, File::E)).setPiece(std::make_shared<King>(King(col)));
+        board[Locus(rank, File::D)].setPiece(std::make_shared<Queen>(Queen(col)));
+        board[Locus(rank, File::E)].setPiece(std::make_shared<King>(King(col)));
     }
 
-    return Board(board, Colour::WHITE);
+    return board;
 }

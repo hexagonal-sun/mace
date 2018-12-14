@@ -17,7 +17,8 @@ enum class SquareType
 class BoardSquare
 {
 public:
-    BoardSquare(Rank r, File f);
+    BoardSquare() {};
+    BoardSquare(Locus l);
     void setPiece(std::shared_ptr<Piece> piece);
     void setEmpty(void);
     bool isOccupied() const;

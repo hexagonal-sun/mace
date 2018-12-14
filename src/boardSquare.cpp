@@ -1,8 +1,8 @@
 #include "boardSquare.h"
 #include "piece.h"
 
-BoardSquare::BoardSquare(Rank r, File f)
-    : loc_(Locus(r, f)),
+BoardSquare::BoardSquare(Locus l)
+    : loc_(l),
       isOccupied_(false)
 {
 }
