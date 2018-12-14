@@ -40,7 +40,6 @@ private:
     Board(Colour nextMoveColour);
     void forEachPieceMoves(Colour c, moveCallback_t callback) const;
     bool isPieceUnderAttack(Locus l) const;
-    std::vector<Move> moves_;
     locusList_t locatePiece(Colour c, PieceType t) const;
     Colour nextMoveColour_;
     ChessBoard board_;
