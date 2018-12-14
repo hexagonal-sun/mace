@@ -24,3 +24,39 @@ ChessBoard::at(const Locus &l) const
 {
     return b_.at(l.getIndex());
 }
+
+ChessBoard::iterator<BoardSquare>
+ChessBoard::begin()
+{
+    return ChessBoard::iterator<BoardSquare>(&b_[0]);
+}
+
+ChessBoard::iterator<BoardSquare>
+ChessBoard::end()
+{
+    return ChessBoard::iterator<BoardSquare>(&b_[128]);
+}
+
+ChessBoard::iterator<BoardSquare const>
+ChessBoard::begin() const
+{
+    return ChessBoard::iterator<BoardSquare const>(&b_[0]);
+}
+
+ChessBoard::iterator<BoardSquare const>
+ChessBoard::end() const
+{
+    return ChessBoard::iterator<BoardSquare const>(&b_[128]);
+}
+
+ChessBoard::iterator<BoardSquare const>
+ChessBoard::cbegin() const
+{
+    return ChessBoard::iterator<BoardSquare const>(&b_[0]);
+}
+
+ChessBoard::iterator<BoardSquare const>
+ChessBoard::cend() const
+{
+    return ChessBoard::iterator<BoardSquare const>(&b_[128]);
+}

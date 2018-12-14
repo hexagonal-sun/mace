@@ -4,15 +4,14 @@
 #include <tuple>
 
 enum class Rank {
-    ONE   = 0,
-    TWO   = 1,
-    THREE = 2,
-    FOUR  = 3,
-    FIVE  = 4,
-    SIX   = 5,
-    SEVEN = 6,
-    EIGHT = 7,
-    DUMMY
+    ONE   = 0x00,
+    TWO   = 0x10,
+    THREE = 0x20,
+    FOUR  = 0x30,
+    FIVE  = 0x40,
+    SIX   = 0x50,
+    SEVEN = 0x60,
+    EIGHT = 0x70,
 };
 
 enum class File {
@@ -24,7 +23,6 @@ enum class File {
     F = 5,
     G = 6,
     H = 7,
-    DUMMY
 };
 
 enum class Direction {
@@ -53,7 +51,6 @@ public:
     Locus();
     Locus(Rank r, File f);
     Locus(char rank, char file);
-    void print(std::ostream &o) const;
     size_t getIndex(void) const;
     Rank getRank(void) const;
     bool isValid(void) const;
@@ -61,7 +58,8 @@ public:
     Locus translate(Direction d) const;
     bool operator==(const Locus& other) const;
 private:
-    std::tuple<Rank, File> loc_;
+    Locus(int idx);
+    uint8_t idx_;
 };
 
 std::ostream &operator<<(std::ostream &os, const Locus &l);
