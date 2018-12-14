@@ -10,11 +10,11 @@ Colour Piece::getColour(void) const
     return colour_;
 }
 
-std::vector<Move> Piece::applyTranslationSpec(const Board &b, Locus &from,
+moveList_t Piece::applyTranslationSpec(const Board &b, Locus &from,
                                               const PieceMovementSpec &ms,
                                               bool singularTransform) const
 {
-    std::vector<Move> ret;
+    moveList_t ret;
 
     for (const auto &dirs : ms)
     {

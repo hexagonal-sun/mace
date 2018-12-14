@@ -1,5 +1,6 @@
 #pragma once
 
+#include <boost/container/small_vector.hpp>
 #include <vector>
 #include <map>
 #include <ostream>
@@ -42,10 +43,11 @@ static inline Colour getOppositeColour(Colour col)
         return Colour::WHITE;
 }
 
+typedef std::tuple<Locus, Locus> Move;
 typedef std::vector<std::vector<Direction>> PieceMovementSpec;
+typedef boost::container::small_vector<Move, 64> moveList_t;
 
 class Board;
-typedef std::tuple<Locus, Locus> Move;
 
 std::ostream &operator<<(std::ostream &o, const Move &m);
 
@@ -53,7 +55,7 @@ class Piece
 {
 public:
     Piece(Colour colour);
-    virtual std::vector<Move> getCandidateMoves(const Board &b, Locus l) const = 0;
+    virtual moveList_t getCandidateMoves(const Board &b, Locus l) const = 0;
     virtual void printPiece(std::ostream &stream) const = 0;
     virtual PieceType getPieceType(void) const  = 0;
     int getValue(void) const;
@@ -61,9 +63,9 @@ public:
     Colour getColour(void) const;
     bool operator==(const Piece &other) const;
 protected:
-    std::vector<Move> applyTranslationSpec(const Board &b, Locus &from,
-                                           const PieceMovementSpec &ms,
-                                           bool singularTransform) const;
+    moveList_t applyTranslationSpec(const Board &b, Locus &from,
+                                    const PieceMovementSpec &ms,
+                                    bool singularTransform) const;
     char formatPieceChar(char pieceName) const;
     std::shared_ptr<BoardSquare> square_;
 private:

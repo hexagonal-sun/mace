@@ -99,7 +99,7 @@ bool Board::isPieceUnderAttack(Locus l) const
 
     forEachPieceMoves(getOppositeColour(pieceColour),
                       [&](std::shared_ptr<Piece> piece,
-                          const std::vector<Move> &moves)
+                          const moveList_t &moves)
     {
         for (const auto &move : moves)
             if (std::get<1>(move) == l) {
@@ -147,7 +147,7 @@ std::vector<Move> Board::getAllCandidateMoves(void)
     std::vector<Move> ret;
 
     const auto nonCheckCallback = [&](std::shared_ptr<Piece> piece,
-                                      const std::vector<Move> &moves)
+                                      const moveList_t &moves)
     {
         auto ourColour = getNextMoveColour();
 
@@ -161,7 +161,7 @@ std::vector<Move> Board::getAllCandidateMoves(void)
     };
 
     const auto checkCallback = [&](std::shared_ptr<Piece> piece,
-                                   const std::vector<Move> &moves)
+                                   const moveList_t &moves)
     {
         auto ourColour = getNextMoveColour();
 

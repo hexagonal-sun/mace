@@ -5,11 +5,11 @@ Pawn::Pawn(Colour col)
 {
 }
 
-std::vector<Move> Pawn::getCandidateMoves(const Board &b, Locus from) const
+moveList_t Pawn::getCandidateMoves(const Board &b, Locus from) const
 {
     const auto dir = getColour() == Colour::WHITE ? Direction::NORTH : Direction::SOUTH;
     const auto startingRank = getColour() == Colour::WHITE ? Rank::TWO : Rank::SEVEN;
-    std::vector<Move> ret;
+    moveList_t ret;
 
     auto newLoc = from.translate(dir);
 

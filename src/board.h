@@ -14,8 +14,9 @@ enum class Colour;
 enum class PieceType;
 
 typedef std::tuple<Locus, Locus> Move;
+typedef boost::container::small_vector<Move, 64> moveList_t;
 typedef std::function<bool(std::shared_ptr<Piece> piece,
-                           const std::vector<Move> &)> moveCallback_t;
+                           const moveList_t &)> moveCallback_t;
 
 class Board
 {
