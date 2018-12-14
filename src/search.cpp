@@ -58,7 +58,7 @@ Move searchMove(Board &b, size_t depth)
     int alpha = -INT_MAX;
     int beta = INT_MAX;
 
-    Move m(Locus('1', 'a'), Locus('1', 'a'));
+    Move m;
 
     int result = alphaBeta(b, depth, alpha, beta,
                            b.getNextMoveColour() == Colour::WHITE ? true : false,

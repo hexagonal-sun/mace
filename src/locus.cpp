@@ -25,7 +25,7 @@ static const std::unordered_map<char, File> fileNames {
 
 
 Locus::Locus()
-    : loc_(std::make_tuple(Rank::ONE, File::A))
+    : loc_(std::make_tuple(Rank::DUMMY, File::DUMMY))
 {
 }
 
@@ -65,8 +65,19 @@ File Locus::getFile(void) const
     return std::get<1>(loc_);
 }
 
+bool Locus::isValid(void) const
+{
+    if (getRank() == Rank::DUMMY || getFile() == File::DUMMY)
+        return false;
+
+    return true;
+}
+
 size_t Locus::getIndex(void) const
 {
+    if (!isValid())
+        throw std::invalid_argument("Attempted to get index of dummy locus");
+
     return static_cast<size_t>(getRank()) + (static_cast<int>(getFile()) << 3);
 }
 
@@ -100,14 +111,15 @@ Locus Locus::translate(Direction d) const
             rank = Rank::EIGHT;
             break;
         case Rank::EIGHT:
-            throw std::domain_error("Can not translate north of eighth rank");
-            break;
+            return Locus(Rank::DUMMY, File::DUMMY);
+        case Rank::DUMMY:
+            return Locus(Rank::DUMMY, File::DUMMY);
         }
         break;
     case Direction::SOUTH:
         switch (rank) {
         case Rank::ONE:
-            throw std::domain_error("Can not translate south of first rank");
+            return Locus(Rank::DUMMY, File::DUMMY);
             break;
         case Rank::TWO:
             rank = Rank::ONE;
@@ -130,6 +142,8 @@ Locus Locus::translate(Direction d) const
         case Rank::EIGHT:
             rank = Rank::SEVEN;
             break;
+        case Rank::DUMMY:
+            return Locus(Rank::DUMMY, File::DUMMY);
         }
         break;
     case Direction::EAST:
@@ -156,14 +170,15 @@ Locus Locus::translate(Direction d) const
             file = File::H;
             break;
         case File::H:
-            throw std::domain_error("Can not translate east of the H file");
-            break;
+            return Locus(Rank::DUMMY, File::DUMMY);
+        case File::DUMMY:
+            return Locus(Rank::DUMMY, File::DUMMY);
         }
         break;
     case Direction::WEST:
         switch(file) {
         case File::A:
-            throw std::domain_error("Can not translate west of the A file");
+            return Locus(Rank::DUMMY, File::DUMMY);
             break;
         case File::B:
             file = File::A;
@@ -186,6 +201,8 @@ Locus Locus::translate(Direction d) const
         case File::H:
             file = File::G;
             break;
+        case File::DUMMY:
+            return Locus(Rank::DUMMY, File::DUMMY);
         }
         break;
     }

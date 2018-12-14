@@ -20,11 +20,11 @@ std::vector<Move> Piece::applyTranslationSpec(const Board &b, Locus &from,
     {
         auto l = from;
         while (true) {
-            try {
-                for (const auto &dir : dirs)
-                    l = l.translate(dir);
-            } catch (std::domain_error &e) {
-                goto nextDir;
+            for (const auto &dir : dirs) {
+                l = l.translate(dir);
+
+                if (!l.isValid())
+                    goto nextDir;
             }
 
             auto squareType = b[l].getSquareType(getColour());

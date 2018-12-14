@@ -11,7 +11,8 @@ enum class Rank {
     FIVE  = 4,
     SIX   = 5,
     SEVEN = 6,
-    EIGHT = 7
+    EIGHT = 7,
+    DUMMY
 };
 
 enum class File {
@@ -22,7 +23,8 @@ enum class File {
     E = 4,
     F = 5,
     G = 6,
-    H = 7
+    H = 7,
+    DUMMY
 };
 
 enum class Direction {
@@ -54,6 +56,7 @@ public:
     void print(std::ostream &o) const;
     size_t getIndex(void) const;
     Rank getRank(void) const;
+    bool isValid(void) const;
     File getFile(void) const;
     Locus translate(Direction d) const;
     bool operator==(const Locus& other) const;

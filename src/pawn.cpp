@@ -26,17 +26,15 @@ std::vector<Move> Pawn::getCandidateMoves(const Board &b, Locus from) const
     }
 
     // See if we can take any pieces.
-    for (const auto &takeDir : {Direction::EAST, Direction::WEST})
-        try
-        {
-            const auto &takeLoc = from.translate(dir).translate(takeDir);
-            if (b[takeLoc].getSquareType(getColour()) == SquareType::TAKE)
-                ret.push_back(std::make_tuple(from, takeLoc));
-        }
-        catch (std::domain_error &e)
-        {
+    for (const auto &takeDir : {Direction::EAST, Direction::WEST}) {
+        const auto &takeLoc = from.translate(dir).translate(takeDir);
+
+        if (!takeLoc.isValid())
             continue;
-        }
+
+        if (b[takeLoc].getSquareType(getColour()) == SquareType::TAKE)
+        ret.push_back(std::make_tuple(from, takeLoc));
+    }
 
     return ret;
 }
