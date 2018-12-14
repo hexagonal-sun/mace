@@ -9,6 +9,7 @@
 #include "king.h"
 #include "bishop.h"
 #include "boardSquare.h"
+#include "mover.hpp"
 
 Board::Board(board_t b, Colour nextMoveColour)
     : board_(b), nextMoveColour_(nextMoveColour)
@@ -26,7 +27,7 @@ const BoardSquare & Board::getSquare(std::string name) const
     return board_.at(Locus(rank, file));
 }
 
-bool Board::validateMove(std::string from, std::string to) const
+bool Board::validateMove(std::string from, std::string to)
 {
     return validateMove(getSquare(from).getLocus(), getSquare(to).getLocus());
 }
@@ -46,7 +47,7 @@ const std::vector<Move> &Board::getMoveList(void) const
     return moves_;
 }
 
-bool Board::validateMove(const Locus & from, const Locus &to) const
+bool Board::validateMove(const Locus & from, const Locus &to)
 {
     auto candidate = std::make_tuple(from, to);
 
@@ -112,6 +113,13 @@ bool Board::isPieceUnderAttack(Locus l) const
     return false;
 }
 
+const bool Board::isInCheck(Colour kingsColour) const
+{
+    auto kingLocus = locatePiece(kingsColour, PieceType::KING).at(0);
+
+    return isPieceUnderAttack(kingLocus);
+}
+
 
 const int Board::getEvaluation(void) const
 {
@@ -136,22 +144,47 @@ BoardSquare & Board::operator[](const Locus &l)
     return board_.at(l);
 }
 
-std::vector<Move> Board::getAllCandidateMoves(void) const
+std::vector<Move> Board::getAllCandidateMoves(void)
 {
     std::vector<Move> ret;
 
-    for (const auto &posSquare : board_) {
-        auto square = posSquare.second;
-        if (square.isOccupied() &&
-            square.getPiece()->getColour() == nextMoveColour_) {
-            auto pieceMoves = square.getPiece()->getCandidateMoves(*this,
-                                                                   posSquare.first);
-            ret.insert(ret.end(), pieceMoves.begin(), pieceMoves.end());
+    const auto nonCheckCallback = [&](const std::vector<Move> &moves)
+    {
+        ret.insert(ret.end(), moves.begin(), moves.end());
+    };
+
+    const auto checkCallback = [&](const std::vector<Move> &moves)
+    {
+        auto ourColour = getNextMoveColour();
+
+        for (const auto &move : moves) {
+            Mover m(move, *this);
+            if (!isInCheck(ourColour))
+                ret.push_back(move);
         }
-    }
+    };
+
+    if (isInCheck(getNextMoveColour()))
+        forEachPieceMoves(getNextMoveColour(), checkCallback);
+    else
+        forEachPieceMoves(getNextMoveColour(), nonCheckCallback);
 
     return ret;
 }
+
+void Board::forEachPieceMoves(Colour c, moveCallback_t callback) const
+{
+    for (const auto &posSquare : board_) {
+        auto square = posSquare.second;
+        if (square.isOccupied() &&
+            square.getPiece()->getColour() == c) {
+            const auto pieceMoves = square.getPiece()->getCandidateMoves(*this,
+                                                                         posSquare.first);
+            callback(pieceMoves);
+        }
+    }
+}
+
 
 board_t Board::getEmptyBoard()
 {
