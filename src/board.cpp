@@ -102,15 +102,20 @@ bool Board::isPieceUnderAttack(Locus l) const
 {
     const auto &pieceColour = board_.at(l).getPiece()->getColour();
 
-    for (const auto &posSquare : board_)
-        if (posSquare.second.isOccupied() &&
-            posSquare.second.getPiece()->getColour() == getOppositeColour(pieceColour))
-            for (const auto move : posSquare.second.getPiece()->getCandidateMoves(*this,
-                                                                                  posSquare.first))
-                if (std::get<1>(move) == l)
-                    return true;
+    bool ret = false;
 
-    return false;
+    forEachPieceMoves(getOppositeColour(pieceColour),
+                      [&](const std::vector<Move> &moves)
+    {
+        for (const auto &move : moves)
+            if (std::get<1>(move) == l) {
+                ret = true;
+                return false;
+            }
+        return true;
+    });
+
+    return ret;
 }
 
 const bool Board::isInCheck(Colour kingsColour) const
