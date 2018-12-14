@@ -24,12 +24,11 @@ public:
     static Board getStartingBoard(void);
     bool validateMove(std::string from, std::string to);
     bool validateMove(const Locus &from, const Locus &to);
-    const std::vector<Move> &getMoveList(void) const;
     const Colour getNextMoveColour(void) const;
     Colour &getNextMoveColour(void);
     const int getEvaluation(void) const;
     const bool isInCheck(Colour kingsColour) const;
-    std::vector<Move> getAllCandidateMoves(void);
+    moveList_t getAllCandidateMoves(void);
     const BoardSquare & getSquare(std::string name) const;
     void printBoard(std::ostream &stream) const;
     const BoardSquare & operator[](const Locus &l) const;

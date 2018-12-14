@@ -42,11 +42,6 @@ Colour & Board::getNextMoveColour(void)
     return nextMoveColour_;
 }
 
-const std::vector<Move> &Board::getMoveList(void) const
-{
-    return moves_;
-}
-
 bool Board::validateMove(const Locus & from, const Locus &to)
 {
     auto candidate = std::make_tuple(from, to);
@@ -142,9 +137,9 @@ BoardSquare & Board::operator[](const Locus &l)
     return board_[l];
 }
 
-std::vector<Move> Board::getAllCandidateMoves(void)
+moveList_t Board::getAllCandidateMoves(void)
 {
-    std::vector<Move> ret;
+    moveList_t ret;
 
     const auto nonCheckCallback = [&](std::shared_ptr<Piece> piece,
                                       const moveList_t &moves)
