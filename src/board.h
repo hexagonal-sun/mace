@@ -18,6 +18,8 @@ typedef boost::container::small_vector<Move, 64> moveList_t;
 typedef std::function<bool(std::shared_ptr<Piece> piece,
                            const moveList_t &)> moveCallback_t;
 
+typedef boost::container::small_vector<Locus, 8> locusList_t;
+
 class Board
 {
 public:
@@ -38,8 +40,8 @@ private:
     Board(Colour nextMoveColour);
     void forEachPieceMoves(Colour c, moveCallback_t callback) const;
     bool isPieceUnderAttack(Locus l) const;
-    std::vector<Locus> locatePiece(Colour c, PieceType t) const;
     std::vector<Move> moves_;
+    locusList_t locatePiece(Colour c, PieceType t) const;
     Colour nextMoveColour_;
     ChessBoard board_;
 };

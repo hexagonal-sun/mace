@@ -72,9 +72,9 @@ void Board::printBoard(std::ostream &stream) const
     stream << "To move: " << colourNames.at(nextMoveColour_) << "\n";
 }
 
-std::vector<Locus> Board::locatePiece(Colour c, PieceType t) const
+locusList_t Board::locatePiece(Colour c, PieceType t) const
 {
-    std::vector<Locus> ret;
+    locusList_t ret;
 
     for (const auto &square : board_) {
         if (square.isOccupied() &&
