@@ -157,7 +157,13 @@ std::vector<Move> Board::getAllCandidateMoves(void)
     const auto nonCheckCallback = [&](std::shared_ptr<Piece> piece,
                                       const std::vector<Move> &moves)
     {
-        ret.insert(ret.end(), moves.begin(), moves.end());
+        auto ourColour = getNextMoveColour();
+
+        for (const auto &move : moves) {
+            Mover m(move, *this);
+            if (!isInCheck(ourColour))
+                ret.push_back(move);
+        }
 
         return true;
     };
