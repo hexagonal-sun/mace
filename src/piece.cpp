@@ -52,11 +52,6 @@ char Piece::formatPieceChar(char pieceName) const
         return std::toupper(pieceName);
 }
 
-void Piece::setSquare(std::shared_ptr<BoardSquare> sq)
-{
-    square_ = sq;
-}
-
 int Piece::getValue(void) const
 {
     unsigned int mag = getValueMagnitude();

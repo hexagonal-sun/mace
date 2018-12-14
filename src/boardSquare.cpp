@@ -10,7 +10,6 @@ BoardSquare::BoardSquare(Locus l)
 void BoardSquare::setPiece(std::shared_ptr<Piece> piece)
 {
     piece_ = piece;
-    piece_->setSquare(std::make_shared<BoardSquare>(*this));
     isOccupied_ = true;
 }
 

@@ -59,7 +59,6 @@ public:
     virtual void printPiece(std::ostream &stream) const = 0;
     virtual PieceType getPieceType(void) const  = 0;
     int getValue(void) const;
-    void setSquare(std::shared_ptr<BoardSquare>);
     Colour getColour(void) const;
     bool operator==(const Piece &other) const;
 protected:
