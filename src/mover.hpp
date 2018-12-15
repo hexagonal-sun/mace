@@ -37,5 +37,5 @@ public:
 private:
     const Move &move_;
     Board &board_;
-    std::shared_ptr<Piece> takenPiece;
+    Piece *takenPiece;
 };

@@ -1,6 +1,5 @@
 #pragma once
 #include <ostream>
-#include <memory>
 
 #include "locus.h"
 
@@ -19,16 +18,16 @@ class BoardSquare
 public:
     BoardSquare() {};
     BoardSquare(Locus l);
-    void setPiece(std::shared_ptr<Piece> piece);
+    void setPiece(Piece *piece);
     void setEmpty(void);
     bool isOccupied() const;
     const Locus getLocus(void) const;
     SquareType getSquareType(Colour c) const;
     void printSquare(std::ostream &stream) const;
-    std::shared_ptr<Piece> getPiece(void) const;
+    Piece *getPiece(void) const;
     bool operator==(const BoardSquare &other) const;
 private:
     bool isOccupied_;
     Locus loc_;
-    std::shared_ptr<Piece> piece_;
+    Piece *piece_;
 };

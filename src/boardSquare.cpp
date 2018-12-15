@@ -7,7 +7,7 @@ BoardSquare::BoardSquare(Locus l)
 {
 }
 
-void BoardSquare::setPiece(std::shared_ptr<Piece> piece)
+void BoardSquare::setPiece(Piece *piece)
 {
     piece_ = piece;
     isOccupied_ = true;
@@ -37,7 +37,7 @@ void BoardSquare::printSquare(std::ostream &stream) const
         piece_->printPiece(stream);
 }
 
-std::shared_ptr<Piece> BoardSquare::getPiece(void) const
+Piece *BoardSquare::getPiece(void) const
 {
     if (!isOccupied_)
         throw std::domain_error("Attempted to get piece on an empty square");

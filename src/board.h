@@ -1,6 +1,5 @@
 #pragma once
 #include <array>
-#include <memory>
 #include <ostream>
 #include <array>
 #include <functional>
@@ -15,7 +14,7 @@ enum class PieceType;
 
 typedef std::tuple<Locus, Locus> Move;
 typedef boost::container::small_vector<Move, 64> moveList_t;
-typedef std::function<bool(std::shared_ptr<Piece> piece,
+typedef std::function<bool(Piece *piece,
                            const moveList_t &)> moveCallback_t;
 
 typedef boost::container::small_vector<Locus, 8> locusList_t;

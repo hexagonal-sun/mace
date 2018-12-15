@@ -93,7 +93,7 @@ bool Board::isPieceUnderAttack(Locus l) const
     bool ret = false;
 
     forEachPieceMoves(getOppositeColour(pieceColour),
-                      [&](std::shared_ptr<Piece> piece,
+                      [&](Piece *piece,
                           const moveList_t &moves)
     {
         for (const auto &move : moves)
@@ -141,7 +141,7 @@ moveList_t Board::getAllCandidateMoves(void)
 {
     moveList_t ret;
 
-    const auto nonCheckCallback = [&](std::shared_ptr<Piece> piece,
+    const auto nonCheckCallback = [&](Piece *piece,
                                       const moveList_t &moves)
     {
         auto ourColour = getNextMoveColour();
@@ -155,7 +155,7 @@ moveList_t Board::getAllCandidateMoves(void)
         return true;
     };
 
-    const auto checkCallback = [&](std::shared_ptr<Piece> piece,
+    const auto checkCallback = [&](Piece *piece,
                                    const moveList_t &moves)
     {
         auto ourColour = getNextMoveColour();
@@ -212,23 +212,23 @@ Board Board::getStartingBoard()
     Board board(Colour::WHITE);
 
     for (const auto file : FILES) {
-        board[Locus(Rank::SEVEN, file)].setPiece(std::make_shared<Pawn>(Pawn(Colour::BLACK)));
-        board[Locus(Rank::TWO, file)].setPiece(std::make_shared<Pawn>(Pawn(Colour::WHITE)));
+        board[Locus(Rank::SEVEN, file)].setPiece(new Pawn(Colour::BLACK));
+        board[Locus(Rank::TWO, file)].setPiece(new Pawn(Colour::WHITE));
     }
 
     for (const auto col : {Colour::WHITE, Colour::BLACK}) {
         auto rank = col == Colour::WHITE ? Rank::ONE : Rank::EIGHT;
         for (const auto file : {File::A, File::H})
-            board[Locus(rank, file)].setPiece(std::make_shared<Rook>(Rook(col)));
+            board[Locus(rank, file)].setPiece(new Rook(col));
 
         for (const auto file : {File::B, File::G})
-            board[Locus(rank, file)].setPiece(std::make_shared<Knight>(Knight(col)));
+            board[Locus(rank, file)].setPiece(new Knight(col));
 
         for (const auto file : {File::C, File::F})
-            board[Locus(rank, file)].setPiece(std::make_shared<Bishop>(Bishop(col)));
+            board[Locus(rank, file)].setPiece(new Bishop(col));
 
-        board[Locus(rank, File::D)].setPiece(std::make_shared<Queen>(Queen(col)));
-        board[Locus(rank, File::E)].setPiece(std::make_shared<King>(King(col)));
+        board[Locus(rank, File::D)].setPiece(new Queen(col));
+        board[Locus(rank, File::E)].setPiece(new King(col));
     }
 
     return board;
