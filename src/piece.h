@@ -66,7 +66,6 @@ protected:
                                     const PieceMovementSpec &ms,
                                     bool singularTransform) const;
     char formatPieceChar(char pieceName) const;
-    std::shared_ptr<BoardSquare> square_;
 private:
     virtual unsigned int getValueMagnitude(void) const = 0;
     Colour colour_;
