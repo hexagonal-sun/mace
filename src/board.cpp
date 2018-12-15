@@ -1,6 +1,9 @@
+#include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <locale>
 #include <iostream>
+#include <regex>
+
 #include "board.h"
 #include "pawn.h"
 #include "rook.h"
@@ -224,30 +227,97 @@ void Board::forEachPieceMoves(Colour c, moveCallback_t callback) const
     }
 }
 
-
 Board Board::getStartingBoard()
 {
-    Board board(Colour::WHITE);
+    return constructFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+}
 
-    for (const auto file : FILES) {
-        board[Locus(Rank::SEVEN, file)].setPiece(new Pawn(Colour::BLACK));
-        board[Locus(Rank::TWO, file)].setPiece(new Pawn(Colour::WHITE));
+Board Board::constructFromFEN(std::string fen)
+{
+    std::vector<std::string> fields;
+
+    boost::split(fields, fen, boost::is_any_of(" "));
+
+    if (fields.size() != 6)
+        throw std::invalid_argument("Wrong number of fields in FEN string");
+
+    char turnChar = std::tolower(fields[1][0]);
+    Colour turn;
+
+    switch (turnChar)
+    {
+    case 'w':
+        turn = Colour::WHITE;
+        break;
+    case 'b':
+        turn = Colour::BLACK;
+        break;
+    default:
+        throw std::invalid_argument(fields[2] + " is not a valid turn specifier");
     }
 
-    for (const auto col : {Colour::WHITE, Colour::BLACK}) {
-        auto rank = col == Colour::WHITE ? Rank::ONE : Rank::EIGHT;
-        for (const auto file : {File::A, File::H})
-            board[Locus(rank, file)].setPiece(new Rook(col));
+    Board board(turn);
 
-        for (const auto file : {File::B, File::G})
-            board[Locus(rank, file)].setPiece(new Knight(col));
+    auto enPassantSquare = fields[3];
 
-        for (const auto file : {File::C, File::F})
-            board[Locus(rank, file)].setPiece(new Bishop(col));
+    if (enPassantSquare != "-") {
+        Locus enPassantLocus(enPassantSquare[1], enPassantSquare[0]);
 
-        board[Locus(rank, File::D)].setPiece(new Queen(col));
-        board[Locus(rank, File::E)].setPiece(new King(col));
-        board.getKingLocus(col) = Locus(rank, File::E);
+        board.getEnPassantLocus() = enPassantLocus;
+    }
+
+    std::vector<std::string> boardSpec;
+    boost::split(boardSpec, fields[0], boost::is_any_of("/"));
+
+    if (boardSpec.size() != 8)
+        throw std::invalid_argument("Board spec does not have 8 fields");
+
+    auto numericRegex = std::regex("[1-8]");
+    auto rank = Rank::EIGHT;
+
+    for (const auto boardRow : boardSpec) {
+        auto file = File::A;
+
+        for (const auto pieceSpec : boardRow) {
+            auto pieceSpecString = std::string(1, pieceSpec);
+            auto colour = std::isupper(pieceSpec) ? Colour::WHITE : Colour::BLACK;
+
+            if (std::regex_match(pieceSpecString, numericRegex)) {
+                file = static_cast<File>(static_cast<int>(file) +
+                                         std::stoi(pieceSpecString));
+
+                continue;
+            }
+
+            switch (std::tolower(pieceSpec)) {
+            case 'p':
+                board[Locus(rank, file)].setPiece(new Pawn(colour));
+                break;
+            case 'r':
+                board[Locus(rank, file)].setPiece(new Rook(colour));
+                break;
+            case 'n':
+                board[Locus(rank, file)].setPiece(new Knight(colour));
+                break;
+            case 'b':
+                board[Locus(rank, file)].setPiece(new Bishop(colour));
+                break;
+            case 'q':
+                board[Locus(rank, file)].setPiece(new Queen(colour));
+                break;
+            case 'k':
+                board[Locus(rank, file)].setPiece(new King(colour));
+                board.getKingLocus(colour) = Locus(rank, file);
+                break;
+            default:
+                throw std::invalid_argument("Encountered unknown piece specification: " +
+                                            pieceSpecString);
+            }
+
+            file = static_cast<File>(static_cast<int>(file) + 1);
+        }
+
+        rank = static_cast<Rank>(static_cast<int>(rank) - 0x10);
     }
 
     return board;

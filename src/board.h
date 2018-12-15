@@ -22,6 +22,7 @@ class Board
 {
 public:
     static Board getStartingBoard(void);
+    static Board constructFromFEN(std::string fen);
     Move validateMove(std::string from, std::string to);
     Move validateMove(const Locus &from, const Locus &to);
     const Colour getNextMoveColour(void) const;
