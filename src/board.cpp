@@ -187,6 +187,16 @@ Locus &Board::getKingLocus(Colour c)
     return kingLocus_[static_cast<int>(c)];
 }
 
+const Locus &Board::getEnPassantLocus(void) const
+{
+    return enPassantCapture_;
+}
+
+Locus &Board::getEnPassantLocus(void)
+{
+    return enPassantCapture_;
+}
+
 int Board::perft(int depth)
 {
     if (!depth)
