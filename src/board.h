@@ -8,12 +8,11 @@
 #include "boardSquare.h"
 #include "chessBoard.h"
 #include "piece.h"
+#include "move.hpp"
 
 enum class Colour;
 enum class PieceType;
 
-typedef std::tuple<Locus, Locus> Move;
-typedef boost::container::small_vector<Move, 64> moveList_t;
 typedef std::function<bool(Piece *piece,
                            const moveList_t &)> moveCallback_t;
 
@@ -23,8 +22,8 @@ class Board
 {
 public:
     static Board getStartingBoard(void);
-    bool validateMove(std::string from, std::string to);
-    bool validateMove(const Locus &from, const Locus &to);
+    Move validateMove(std::string from, std::string to);
+    Move validateMove(const Locus &from, const Locus &to);
     const Colour getNextMoveColour(void) const;
     Colour &getNextMoveColour(void);
     const int getEvaluation(void) const;

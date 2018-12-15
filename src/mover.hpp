@@ -7,8 +7,8 @@ public:
     Mover(const Move &m, Board &b)
         : move_(m), board_(b), takenPiece(nullptr)
         {
-            auto &sourceSquare = board_[std::get<0>(move_)];
-            auto &destSquare = board_[std::get<1>(move_)];
+            auto &sourceSquare = board_[move_.getFrom()];
+            auto &destSquare = board_[move_.getTo()];
             auto movingPiece = sourceSquare.getPiece();
 
             if (destSquare.isOccupied())
@@ -18,14 +18,14 @@ public:
             sourceSquare.setEmpty();
 
             if (movingPiece->getPieceType() == PieceType::KING)
-                board_.getKingLocus(movingPiece->getColour()) = std::get<1>(move_);
+                board_.getKingLocus(movingPiece->getColour()) = move_.getTo();
 
             board_.getNextMoveColour() = getOppositeColour(board_.getNextMoveColour());
         }
     ~Mover()
         {
-            auto &sourceSquare = board_[std::get<1>(move_)];
-            auto &destSquare = board_[std::get<0>(move_)];
+            auto &sourceSquare = board_[move_.getTo()];
+            auto &destSquare = board_[move_.getFrom()];
             auto movingPiece = sourceSquare.getPiece();
 
             destSquare.setPiece(sourceSquare.getPiece());
@@ -36,7 +36,7 @@ public:
                 sourceSquare.setEmpty();
 
             if (movingPiece->getPieceType() == PieceType::KING)
-                board_.getKingLocus(movingPiece->getColour()) = std::get<0>(move_);
+                board_.getKingLocus(movingPiece->getColour()) = move_.getFrom();
 
             board_.getNextMoveColour() = getOppositeColour(board_.getNextMoveColour());
         }

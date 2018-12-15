@@ -32,7 +32,10 @@ moveList_t Piece::applyTranslationSpec(const Board &b, Locus &from,
             if (squareType == SquareType::OCCUPIED)
                 goto nextDir;
 
-            ret.push_back(std::make_tuple(from, l));
+            auto moveType = squareType == SquareType::EMPTY ?
+                MoveType::UNOCCUPIED : MoveType::TAKE;
+
+            ret.push_back(Move(from, l, moveType));
 
             if (singularTransform ||
                 squareType == SquareType::TAKE)
@@ -68,10 +71,4 @@ bool Piece::operator==(const Piece &other) const
         return false;
 
     return getColour() == other.getColour();
-}
-
-std::ostream &operator<<(std::ostream &o, const Move &m)
-{
-    o << std::get<0>(m) << std::get<1>(m);
-    return o;
 }

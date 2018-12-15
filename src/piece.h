@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/container/small_vector.hpp>
 #include <vector>
 #include <map>
 #include <ostream>
@@ -9,6 +8,7 @@
 
 #include "board.h"
 #include "locus.h"
+#include "move.hpp"
 
 class BoardSquare;
 
@@ -42,13 +42,9 @@ static inline Colour getOppositeColour(Colour col)
         return Colour::WHITE;
 }
 
-typedef std::tuple<Locus, Locus> Move;
 typedef std::vector<std::vector<Direction>> PieceMovementSpec;
-typedef boost::container::small_vector<Move, 64> moveList_t;
 
 class Board;
-
-std::ostream &operator<<(std::ostream &o, const Move &m);
 
 class Piece
 {

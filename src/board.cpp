@@ -27,7 +27,7 @@ const BoardSquare & Board::getSquare(std::string name) const
     return board_.at(Locus(rank, file));
 }
 
-bool Board::validateMove(std::string from, std::string to)
+Move Board::validateMove(std::string from, std::string to)
 {
     return validateMove(getSquare(from).getLocus(), getSquare(to).getLocus());
 }
@@ -42,18 +42,16 @@ Colour & Board::getNextMoveColour(void)
     return nextMoveColour_;
 }
 
-bool Board::validateMove(const Locus & from, const Locus &to)
+Move Board::validateMove(const Locus & from, const Locus &to)
 {
-    auto candidate = std::make_tuple(from, to);
-
     const auto &allowedMoves = getAllCandidateMoves();
 
-    if (std::find(allowedMoves.begin(),
-                  allowedMoves.end(),
-                  candidate) == allowedMoves.end())
-        return false;
-    else
-        return true;
+    for (const auto &m : allowedMoves) {
+        if (m.getFrom() == from && m.getTo() == to)
+            return m;
+    }
+
+    return Move();
 }
 
 void Board::printBoard(std::ostream &stream) const
@@ -97,7 +95,7 @@ bool Board::isPieceUnderAttack(Locus l) const
                           const moveList_t &moves)
     {
         for (const auto &move : moves)
-            if (std::get<1>(move) == l) {
+            if (move.getTo() == l) {
                 ret = true;
                 return false;
             }

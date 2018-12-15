@@ -3,41 +3,40 @@
 #include "search.h"
 #include "mover.hpp"
 
+void play(Board &b)
+{
+    b.printBoard(std::cout);
+
+    for (const auto move : b.getAllCandidateMoves())
+        std::cout << "Move: " << move << "\n";
+
+    std::string from;
+    std::string to;
+    std::cout << "From: ";
+    std::cin >> from;
+    if (from == "exit")
+        return;
+    std::cout << "To: ";
+    std::cin >> to;
+    std::cout << "\n";
+
+    auto m = b.validateMove(from, to);
+
+    if (!m.isValid()) {
+        std::cout << "Invalid move\n";
+        play(b);
+    }
+
+    Mover a(m, b);
+
+    play(b);
+}
+
 int main()
 {
     Board b = Board::getStartingBoard();
 
-    for (const auto i : {0, 1, 2, 3, 4})
-        std::cout << "pertft(" << i << "): " << b.perft(i) << "\n";
-
-    while (1)
-    {
-        b.printBoard(std::cout);
-
-        std::string from;
-        std::string to;
-        std::cout << "From: ";
-        std::cin >> from;
-        if (from == "exit")
-            return 0;
-        std::cout << "To: ";
-        std::cin >> to;
-        std::cout << "\n";
-
-        if (!b.validateMove(from, to)) {
-            std::cout << "Invalid move\n";
-            continue;
-        }
-
-        Move m = {Locus(from[1], from[0]), Locus(to[1], to[0])};
-        Mover a(m, b);
-
-        std::cout << "Thinking....\n";
-
-        Move bestMove = searchMove(b, 5);
-
-        std::cout << "My move: " << std::get<0>(bestMove) << std::get<1>(bestMove) << "\n";
-    }
+    play(b);
 
     return 0;
 }

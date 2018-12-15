@@ -14,14 +14,15 @@ moveList_t Pawn::getCandidateMoves(const Board &b, Locus from) const
     auto newLoc = from.translate(dir);
 
     if (b[newLoc].getSquareType(getColour()) == SquareType::EMPTY) {
-        ret.push_back(std::make_tuple(from, newLoc));
+        ret.push_back(Move(from, newLoc, MoveType::UNOCCUPIED));
 
         // We can only move a pawn forward two squares if it isn't
         // obstructed at `newLoc' and it's on it's starting rank.
         if (from.getRank() == startingRank) {
             auto doubleMove = newLoc.translate(dir);
             if (b[doubleMove].getSquareType(getColour()) == SquareType::EMPTY)
-                ret.push_back(std::make_tuple(from, doubleMove));
+                ret.push_back(Move(from, doubleMove,
+                                   MoveType::UNOCCUPIED));
         }
     }
 
@@ -33,7 +34,7 @@ moveList_t Pawn::getCandidateMoves(const Board &b, Locus from) const
             continue;
 
         if (b[takeLoc].getSquareType(getColour()) == SquareType::TAKE)
-        ret.push_back(std::make_tuple(from, takeLoc));
+            ret.push_back(Move(from, takeLoc, MoveType::TAKE));
     }
 
     return ret;
