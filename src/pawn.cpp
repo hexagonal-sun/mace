@@ -29,9 +29,16 @@ moveList_t Pawn::getCandidateMoves(const Board &b, Locus from) const
     // See if we can take any pieces.
     for (const auto &takeDir : {Direction::EAST, Direction::WEST}) {
         const auto &takeLoc = from.translate(dir).translate(takeDir);
+        auto enPassantRank = getColour() == Colour::WHITE ?
+            Rank::FIVE : Rank::FOUR;
 
         if (!takeLoc.isValid())
             continue;
+
+        if (from.getRank() == enPassantRank &&
+            takeLoc == b.getEnPassantLocus())
+            ret.push_back(Move(from, takeLoc,
+                               MoveType::ENPASSANT_TAKE));
 
         if (b[takeLoc].getSquareType(getColour()) == SquareType::TAKE)
             ret.push_back(Move(from, takeLoc, MoveType::TAKE));
