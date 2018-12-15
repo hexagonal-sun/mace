@@ -29,6 +29,8 @@ public:
     Colour &getNextMoveColour(void);
     const int getEvaluation(void) const;
     const bool isInCheck(Colour kingsColour) const;
+    const Locus &getKingLocus(Colour c) const;
+    Locus &getKingLocus(Colour c);
     moveList_t getAllCandidateMoves(void);
     const BoardSquare & getSquare(std::string name) const;
     void printBoard(std::ostream &stream) const;
@@ -37,6 +39,7 @@ public:
     int perft(int depth);
 private:
     Board(Colour nextMoveColour);
+    std::array<Locus, 2> kingLocus_;
     void forEachPieceMoves(Colour c, moveCallback_t callback) const;
     bool isPieceUnderAttack(Locus l) const;
     locusList_t locatePiece(Colour c, PieceType t) const;

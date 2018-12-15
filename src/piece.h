@@ -14,8 +14,8 @@ class BoardSquare;
 
 enum class Colour
 {
-    WHITE,
-    BLACK
+    WHITE = 0,
+    BLACK = 1
 };
 
 enum class PieceType

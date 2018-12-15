@@ -109,7 +109,7 @@ bool Board::isPieceUnderAttack(Locus l) const
 
 const bool Board::isInCheck(Colour kingsColour) const
 {
-    auto kingLocus = locatePiece(kingsColour, PieceType::KING).at(0);
+    const auto &kingLocus = getKingLocus(kingsColour);
 
     return isPieceUnderAttack(kingLocus);
 }
@@ -177,6 +177,16 @@ moveList_t Board::getAllCandidateMoves(void)
     return ret;
 }
 
+const Locus &Board::getKingLocus(Colour c) const
+{
+    return kingLocus_[static_cast<int>(c)];
+}
+
+Locus &Board::getKingLocus(Colour c)
+{
+    return kingLocus_[static_cast<int>(c)];
+}
+
 int Board::perft(int depth)
 {
     if (!depth)
@@ -229,6 +239,7 @@ Board Board::getStartingBoard()
 
         board[Locus(rank, File::D)].setPiece(new Queen(col));
         board[Locus(rank, File::E)].setPiece(new King(col));
+        board.getKingLocus(col) = Locus(rank, File::E);
     }
 
     return board;

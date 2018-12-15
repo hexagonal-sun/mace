@@ -9,6 +9,7 @@ public:
         {
             auto &sourceSquare = board_[std::get<0>(move_)];
             auto &destSquare = board_[std::get<1>(move_)];
+            auto movingPiece = sourceSquare.getPiece();
 
             if (destSquare.isOccupied())
                 takenPiece = destSquare.getPiece();
@@ -16,12 +17,16 @@ public:
             destSquare.setPiece(sourceSquare.getPiece());
             sourceSquare.setEmpty();
 
+            if (movingPiece->getPieceType() == PieceType::KING)
+                board_.getKingLocus(movingPiece->getColour()) = std::get<1>(move_);
+
             board_.getNextMoveColour() = getOppositeColour(board_.getNextMoveColour());
         }
     ~Mover()
         {
             auto &sourceSquare = board_[std::get<1>(move_)];
             auto &destSquare = board_[std::get<0>(move_)];
+            auto movingPiece = sourceSquare.getPiece();
 
             destSquare.setPiece(sourceSquare.getPiece());
 
@@ -29,6 +34,9 @@ public:
                 sourceSquare.setPiece(takenPiece);
             else
                 sourceSquare.setEmpty();
+
+            if (movingPiece->getPieceType() == PieceType::KING)
+                board_.getKingLocus(movingPiece->getColour()) = std::get<0>(move_);
 
             board_.getNextMoveColour() = getOppositeColour(board_.getNextMoveColour());
         }
