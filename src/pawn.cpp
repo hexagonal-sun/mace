@@ -22,7 +22,7 @@ moveList_t Pawn::getCandidateMoves(const Board &b, Locus from) const
             auto doubleMove = newLoc.translate(dir);
             if (b[doubleMove].getSquareType(getColour()) == SquareType::EMPTY)
                 ret.push_back(Move(from, doubleMove,
-                                   MoveType::UNOCCUPIED));
+                                   MoveType::ENPASSANT_ADVANCE));
         }
     }
 

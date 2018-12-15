@@ -9,6 +9,7 @@ enum class MoveType
     UNOCCUPIED,
     CASTLE,
     ENPASSANT_TAKE,
+    ENPASSANT_ADVANCE,
     TAKE
 };
 
