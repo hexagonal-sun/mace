@@ -27,15 +27,7 @@ public:
 
                 // Eliminate all castling rights for this particular
                 // colour on king moves.
-                constexpr CastlingRights whiteMask =
-                    CastlingRights((1 << WhiteKingSideBit) |
-                                   (1 << WhiteQueenSideBit));
-                constexpr CastlingRights blackMask =
-                    CastlingRights((1 << BlackKingSideBit) |
-                                   (1 << BlackQueenSideBit));
-
-                const auto &mask = movingPieceColour == Colour::WHITE ?
-                    whiteMask : blackMask;
+                const auto mask = getCastlingMask(movingPieceColour);
 
                 board_.getCastlingRights() &= ~mask;
             }
@@ -45,15 +37,14 @@ public:
                 (move_.getFrom().getFile() == File::A ||
                  move_.getFrom().getFile() == File::H))
             {
-                static const std::map<std::tuple<Colour, File>, CastlingRights> rightsMap = {
-                    {{Colour::WHITE, File::A}, CastlingRights(1 << WhiteQueenSideBit)},
-                    {{Colour::WHITE, File::H}, CastlingRights(1 << WhiteKingSideBit)},
-                    {{Colour::BLACK, File::A}, CastlingRights(1 << BlackQueenSideBit)},
-                    {{Colour::BLACK, File::H}, CastlingRights(1 << BlackKingSideBit)}
-                };
+                auto mask = getCastlingMask(movingPieceColour);
 
-                board_.getCastlingRights() &= ~rightsMap.at(std::make_tuple(movingPieceColour,
-                                                                            move_.getFrom().getFile()));
+                if (move_.getFrom().getFile() == File::A)
+                    mask &= getQueenSideMask();
+                else
+                    mask &= getKingSideMask();
+
+                board_.getCastlingRights() &= ~mask;1
             }
 
             if (move_.getType() == MoveType::ENPASSANT_ADVANCE)
