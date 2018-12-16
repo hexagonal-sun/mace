@@ -6,17 +6,12 @@
 #include <string>
 #include <locale>
 
+#include "colour.hpp"
 #include "board.h"
 #include "locus.h"
 #include "move.hpp"
 
 class BoardSquare;
-
-enum class Colour
-{
-    WHITE = 0,
-    BLACK = 1
-};
 
 enum class PieceType
 {
@@ -27,20 +22,6 @@ enum class PieceType
     KNIGHT,
     ROOK
 };
-
-static const std::map<Colour, std::string> colourNames =
-{
-    {Colour::WHITE, "White"},
-    {Colour::BLACK, "Black"}
-};
-
-static inline Colour getOppositeColour(Colour col)
-{
-    if (col == Colour::WHITE)
-        return Colour::BLACK;
-    else
-        return Colour::WHITE;
-}
 
 typedef std::vector<std::vector<Direction>> PieceMovementSpec;
 
