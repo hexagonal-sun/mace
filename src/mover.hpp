@@ -6,7 +6,8 @@ class Mover
 public:
     Mover(const Move &m, Board &b)
         : move_(m), board_(b), takenPiece(nullptr),
-          enPassantCapture_(b.getEnPassantLocus())
+          enPassantCapture_(b.getEnPassantLocus()),
+          castlingRights_(b.getCastlingRights())
         {
             auto &sourceSquare = board_[move_.getFrom()];
             auto &destSquare = board_[move_.getTo()];
@@ -60,6 +61,7 @@ public:
             board_.getNextMoveColour() = getOppositeColour(board_.getNextMoveColour());
 
             board_.getEnPassantLocus() = enPassantCapture_;
+            board_.getCastlingRights() = castlingRights_;
         }
     Mover(const Mover &m) = delete;
     Mover(Mover &&m) = delete;
@@ -73,6 +75,7 @@ private:
             return Locus(enPassantRank, file);
         }
     const Move &move_;
+    CastlingRights castlingRights_;
     Locus enPassantCapture_;
     Board &board_;
     Locus enPassantTake_;
