@@ -40,6 +40,7 @@ public:
     const BoardSquare & getSquare(std::string name) const;
     void printBoard(std::ostream &stream) const;
     const BoardSquare & operator[](const Locus &l) const;
+    bool isSquareUnderAttack(Locus l, Colour c) const;
     BoardSquare & operator[](const Locus &l);
     int perft(int depth);
 private:
@@ -48,7 +49,6 @@ private:
     Locus enPassantCapture_;
     std::array<Locus, 2> kingLocus_;
     void forEachPieceMoves(Colour c, moveCallback_t callback) const;
-    bool isPieceUnderAttack(Locus l) const;
     locusList_t locatePiece(Colour c, PieceType t) const;
     Colour nextMoveColour_;
     ChessBoard board_;

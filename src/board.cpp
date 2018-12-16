@@ -87,13 +87,11 @@ locusList_t Board::locatePiece(Colour c, PieceType t) const
     return ret;
 }
 
-bool Board::isPieceUnderAttack(Locus l) const
+bool Board::isSquareUnderAttack(Locus l, Colour c) const
 {
-    const auto &pieceColour = board_.at(l).getPiece()->getColour();
-
     bool ret = false;
 
-    forEachPieceMoves(getOppositeColour(pieceColour),
+    forEachPieceMoves(c,
                       [&](Piece *piece,
                           const moveList_t &moves)
     {
@@ -112,7 +110,8 @@ const bool Board::isInCheck(Colour kingsColour) const
 {
     const auto &kingLocus = getKingLocus(kingsColour);
 
-    return isPieceUnderAttack(kingLocus);
+    return isSquareUnderAttack(kingLocus,
+                               getOppositeColour(kingsColour));
 }
 
 
