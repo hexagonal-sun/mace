@@ -188,6 +188,16 @@ Locus &Board::getKingLocus(Colour c)
     return kingLocus_[static_cast<int>(c)];
 }
 
+const CastlingRights Board::getCastlingRights(void) const
+{
+    return castlingRights_;
+}
+
+CastlingRights &Board::getCastlingRights(void)
+{
+    return castlingRights_;
+}
+
 const Locus &Board::getEnPassantLocus(void) const
 {
     return enPassantCapture_;

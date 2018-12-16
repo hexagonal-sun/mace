@@ -9,6 +9,7 @@
 #include "chessBoard.h"
 #include "piece.h"
 #include "move.hpp"
+#include "castlingRights.hpp"
 
 enum class Colour;
 enum class PieceType;
@@ -31,6 +32,8 @@ public:
     const bool isInCheck(Colour kingsColour) const;
     const Locus &getKingLocus(Colour c) const;
     Locus &getKingLocus(Colour c);
+    const CastlingRights getCastlingRights(void) const;
+    CastlingRights &getCastlingRights(void);
     const Locus &getEnPassantLocus(void) const;
     Locus &getEnPassantLocus(void);
     moveList_t getAllCandidateMoves(void);
@@ -41,6 +44,7 @@ public:
     int perft(int depth);
 private:
     Board(Colour nextMoveColour);
+    CastlingRights castlingRights_;
     Locus enPassantCapture_;
     std::array<Locus, 2> kingLocus_;
     void forEachPieceMoves(Colour c, moveCallback_t callback) const;
