@@ -63,3 +63,8 @@ private:
 };
 
 std::ostream &operator<<(std::ostream &os, const Locus &l);
+
+inline Locus operator+(Rank rank, File file)
+{
+    return Locus(rank, file);
+}
