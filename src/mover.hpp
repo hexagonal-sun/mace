@@ -47,6 +47,9 @@ public:
                 board_.getCastlingRights() &= ~mask;
             }
 
+            // TODO: If a rook is captured, update the appropriate
+            // castling rights.
+
             if (move_.getType() == MoveType::CASTLE_KINGSIDE ||
                 move_.getType() == MoveType::CASTLE_QUEENSIDE) {
                 auto rank = movingPieceColour == Colour::WHITE ?
