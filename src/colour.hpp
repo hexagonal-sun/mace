@@ -19,3 +19,8 @@ inline Colour getOppositeColour(Colour col)
     else
         return Colour::WHITE;
 }
+
+inline Colour operator~(Colour c)
+{
+    return getOppositeColour(c);
+}
