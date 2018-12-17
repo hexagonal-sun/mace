@@ -44,7 +44,7 @@ public:
                 else
                     mask &= getKingSideMask();
 
-                board_.getCastlingRights() &= ~mask;1
+                board_.getCastlingRights() &= ~mask;
             }
 
             if (move_.getType() == MoveType::ENPASSANT_ADVANCE)
