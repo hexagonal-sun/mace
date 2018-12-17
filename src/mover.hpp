@@ -47,6 +47,27 @@ public:
                 board_.getCastlingRights() &= ~mask;
             }
 
+            if (move_.getType() == MoveType::CASTLE_KINGSIDE ||
+                move_.getType() == MoveType::CASTLE_QUEENSIDE) {
+                auto rank = movingPieceColour == Colour::WHITE ?
+                    Rank::ONE : Rank::EIGHT;
+
+                if (move_.getType() == MoveType::CASTLE_KINGSIDE) {
+                    castlingRookSource_ = rank + File::H;
+                    castlingRookDest_ = rank + File::F;
+                } else {
+                    castlingRookSource_ = rank + File::A;
+                    castlingRookDest_ = rank + File::D;
+                }
+
+                board_[castlingRookDest_].setPiece(board_[castlingRookSource_].getPiece());
+                board_[castlingRookSource_].setEmpty();
+
+                // Clear all castling rights for this colour after
+                // castling has occurred.
+                board_.getCastlingRights() &= ~getCastlingMask(movingPieceColour);
+            }
+
             if (move_.getType() == MoveType::ENPASSANT_ADVANCE)
                 board_.getEnPassantLocus() = enPassantTransform(m.getTo(),
                                                                 movingPieceColour);
@@ -80,6 +101,14 @@ public:
             if (movingPiece->getPieceType() == PieceType::KING)
                 board_.getKingLocus(movingPiece->getColour()) = move_.getFrom();
 
+            // Restore the rooks position on castling moves.
+            if (move_.getType() == MoveType::CASTLE_KINGSIDE ||
+                move_.getType() == MoveType::CASTLE_QUEENSIDE) {
+                board_[castlingRookSource_].setPiece(board_[castlingRookDest_].getPiece());
+                board_[castlingRookDest_].setEmpty();
+            }
+
+
             board_.getNextMoveColour() = getOppositeColour(board_.getNextMoveColour());
 
             board_.getEnPassantLocus() = enPassantCapture_;
@@ -101,5 +130,7 @@ private:
     Locus enPassantCapture_;
     Board &board_;
     Locus enPassantTake_;
+    Locus castlingRookSource_;
+    Locus castlingRookDest_;
     Piece *takenPiece;
 };
