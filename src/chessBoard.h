@@ -141,11 +141,6 @@ public:
                 return (!(curLoc_ == other.curLoc_));
             }
 
-        ChessBoard::RayIterator<ret_type, chessboard_type, ray_type> &begin()
-            {
-                return *this;
-            }
-
         ChessBoard::RayIterator<ret_type, chessboard_type, ray_type> end()
             {
                 return ChessBoard::RayIterator<ret_type,
