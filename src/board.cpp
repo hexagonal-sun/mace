@@ -262,7 +262,7 @@ Locus &Board::getEnPassantLocus(void)
     return enPassantCapture_;
 }
 
-int Board::perft(int depth)
+int Board::perft(int depth, bool divide)
 {
     if (!depth)
         return 1;
@@ -272,7 +272,12 @@ int Board::perft(int depth)
     for (const auto move : getAllCandidateMoves()) {
         Mover m(move, *this);
 
-        nodes += perft(depth - 1);
+        int moveNodes = perft(depth - 1, false);
+
+        if (divide)
+            std::cout << move << ": " << moveNodes << "\n";
+
+        nodes += moveNodes;
     }
 
     return nodes;

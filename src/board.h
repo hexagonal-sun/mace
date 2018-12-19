@@ -42,7 +42,7 @@ public:
     const BoardSquare & operator[](const Locus &l) const;
     bool isSquareUnderAttack(Locus l, Colour c) const;
     BoardSquare & operator[](const Locus &l);
-    int perft(int depth);
+    int perft(int depth, bool divide);
 private:
     Board(Colour nextMoveColour);
     CastlingRights castlingRights_;
