@@ -89,10 +89,20 @@ public:
                 return manhattanDistance_;
             }
 
-        void operator++()
+        void nextRay()
             {
                 if (ray_type == Ray::KNIGHT)
+                    throw std::logic_error("nextRay called for Knight ray");
+
+                setNextRay();
+            }
+
+        void operator++()
+            {
+                if (ray_type == Ray::KNIGHT) {
+                    manhattanDistance_ = 0;
                     curLoc_ = originalLoc_;
+                }
 
             nextDir:;
                 if (dirs_.empty()) {
@@ -106,9 +116,7 @@ public:
 
                     if (!curLoc_.isValid()) {
 
-                        dirs_.pop();
-                        curLoc_ = originalLoc_;
-                        manhattanDistance_ = 0;
+                        setNextRay();
 
                         goto nextDir;
                     }
@@ -185,6 +193,14 @@ public:
                     throw std::invalid_argument("Unknown ray type");
                 }
             };
+
+        void setNextRay(void)
+            {
+                curLoc_ = originalLoc_;
+                manhattanDistance_ = 0;
+                dirs_.pop();
+            }
+
         const Locus originalLoc_;
         Ray rayType_;
         Locus curLoc_;
