@@ -16,7 +16,7 @@ enum class SquareType
 class BoardSquare
 {
 public:
-    BoardSquare() {};
+    BoardSquare();
     BoardSquare(Locus l);
     void setPiece(Piece *piece);
     void setEmpty(void);

@@ -1,6 +1,12 @@
 #include "boardSquare.h"
 #include "piece.h"
 
+BoardSquare::BoardSquare()
+    : loc_(Locus()),
+      isOccupied_(false)
+{
+}
+
 BoardSquare::BoardSquare(Locus l)
     : loc_(l),
       isOccupied_(false)
