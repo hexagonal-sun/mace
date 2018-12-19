@@ -74,14 +74,19 @@ public:
     {
         friend class ChessBoard;
     public:
-        std::tuple<int, ret_type&> operator*()
+        ret_type& operator*()
             {
-                return std::make_tuple(manhattanDistance_, cb_[curLoc_]);
+                return cb_[curLoc_];
             }
 
-        std::tuple<int, ret_type&> operator->()
+        ret_type& operator->()
             {
-                return std::make_tuple(manhattanDistance_, cb_[curLoc_]);
+                return cb_[curLoc_];
+            }
+
+        int getDistance(void) const
+            {
+                return manhattanDistance_;
             }
 
         void operator++()
