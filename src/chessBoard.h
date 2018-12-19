@@ -74,14 +74,14 @@ public:
     {
         friend class ChessBoard;
     public:
-        ret_type &operator*()
+        std::tuple<int, ret_type&> operator*()
             {
-                return cb_[curLoc_];
+                return std::make_tuple(manhattanDistance_, cb_[curLoc_]);
             }
 
-        ret_type &operator->()
+        std::tuple<int, ret_type&> operator->()
             {
-                return cb_[curLoc_];
+                return std::make_tuple(manhattanDistance_, cb_[curLoc_]);
             }
 
         void operator++()
@@ -97,11 +97,13 @@ public:
 
                 for (auto dir : dirs_.top()) {
                     curLoc_ = curLoc_.translate(dir);
+                    manhattanDistance_ +=1;
 
                     if (!curLoc_.isValid()) {
 
                         dirs_.pop();
                         curLoc_ = originalLoc_;
+                        manhattanDistance_ = 0;
 
                         goto nextDir;
                     }
@@ -142,6 +144,7 @@ public:
         RayIterator(chessboard_type &b, Locus l)
             : curLoc_(l),
               cb_(b),
+              manhattanDistance_(0),
               originalLoc_(l)
             {
                 switch (ray_type) {
@@ -181,6 +184,7 @@ public:
         Ray rayType_;
         Locus curLoc_;
         chessboard_type &cb_;
+        uint8_t manhattanDistance_;
         std::stack<std::list<Direction>> dirs_;
     };
 
