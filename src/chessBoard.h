@@ -197,7 +197,6 @@ public:
             }
 
         const Locus originalLoc_;
-        Ray rayType_;
         Locus curLoc_;
         chessboard_type &cb_;
         uint8_t manhattanDistance_;
