@@ -85,3 +85,14 @@ ChessBoard::getDiagonalIterator(Locus l) const
     return const_diagonal_ray_iterator(*this, l);
 }
 
+ChessBoard::knight_ray_iterator
+ChessBoard::getKnightIterator(Locus l)
+{
+    return knight_ray_iterator(*this, l);
+}
+
+ChessBoard::const_knight_ray_iterator
+ChessBoard::getKnightIterator(Locus l) const
+{
+    return const_knight_ray_iterator(*this, l);
+}

@@ -198,6 +198,13 @@ public:
                                     ChessBoard const,
                                     Ray::DIAGONAL> const_diagonal_ray_iterator;
 
+    typedef ChessBoard::RayIterator<BoardSquare,
+                                    ChessBoard,
+                                    Ray::KNIGHT> knight_ray_iterator;
+    typedef ChessBoard::RayIterator<BoardSquare const,
+                                    ChessBoard const,
+                                    Ray::KNIGHT> const_knight_ray_iterator;
+
     ChessBoard::iterator<BoardSquare> begin();
     ChessBoard::iterator<BoardSquare> end() ;
     ChessBoard::iterator<BoardSquare const> begin() const;
@@ -208,6 +215,8 @@ public:
     const_orthogonal_ray_iterator getOrthogonalIterator(Locus l) const;
     diagonal_ray_iterator getDiagonalIterator(Locus l);
     const_diagonal_ray_iterator getDiagonalIterator(Locus l) const;
+    knight_ray_iterator getKnightIterator(Locus l);
+    const_knight_ray_iterator getKnightIterator(Locus l) const;
 
 private:
     std::array<BoardSquare, 128> b_;
