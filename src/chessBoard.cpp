@@ -73,3 +73,15 @@ ChessBoard::getOrthogonalIterator(Locus l) const
     return const_orthogonal_ray_iterator(*this, l);
 }
 
+ChessBoard::diagonal_ray_iterator
+ChessBoard::getDiagonalIterator(Locus l)
+{
+    return diagonal_ray_iterator(*this, l);
+}
+
+ChessBoard::const_diagonal_ray_iterator
+ChessBoard::getDiagonalIterator(Locus l) const
+{
+    return const_diagonal_ray_iterator(*this, l);
+}
+
