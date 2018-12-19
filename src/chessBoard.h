@@ -184,12 +184,21 @@ public:
         std::stack<std::list<Direction>> dirs_;
     };
 
+    typedef ChessBoard::RayIterator<BoardSquare,
+                                    ChessBoard,
+                                    Ray::ORTHOGONAL> orthogonal_ray_iterator;
+    typedef ChessBoard::RayIterator<BoardSquare const,
+                                    ChessBoard const,
+                                    Ray::ORTHOGONAL> const_orthogonal_ray_iterator;
+
     ChessBoard::iterator<BoardSquare> begin();
     ChessBoard::iterator<BoardSquare> end() ;
     ChessBoard::iterator<BoardSquare const> begin() const;
     ChessBoard::iterator<BoardSquare const> end() const;
     ChessBoard::iterator<BoardSquare const> cbegin() const;
     ChessBoard::iterator<BoardSquare const> cend() const;
+    orthogonal_ray_iterator getOrthogonalIterator(Locus l);
+    const_orthogonal_ray_iterator getOrthogonalIterator(Locus l) const;
 
 private:
     std::array<BoardSquare, 128> b_;

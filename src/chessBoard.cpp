@@ -60,3 +60,16 @@ ChessBoard::cend() const
 {
     return ChessBoard::iterator<BoardSquare const>(&b_[128]);
 }
+
+ChessBoard::orthogonal_ray_iterator
+ChessBoard::getOrthogonalIterator(Locus l)
+{
+    return orthogonal_ray_iterator(*this, l);
+}
+
+ChessBoard::const_orthogonal_ray_iterator
+ChessBoard::getOrthogonalIterator(Locus l) const
+{
+    return const_orthogonal_ray_iterator(*this, l);
+}
+
