@@ -87,23 +87,78 @@ locusList_t Board::locatePiece(Colour c, PieceType t) const
     return ret;
 }
 
-bool Board::isSquareUnderAttack(Locus l, Colour c) const
+template <typename RayIterType>
+static inline bool doRayAttackCheck(RayIterType &&rayIter,
+                                    Colour attackingColour,
+                                    std::function<bool(int, PieceType)> isAttacking)
 {
-    bool ret = false;
+    for (; rayIter != rayIter.end(); ++rayIter) {
+        auto sq = *rayIter;
+        auto d = rayIter.getDistance();
 
-    forEachPieceMoves(c,
-                      [&](Piece *piece,
-                          const moveList_t &moves)
-    {
-        for (const auto &move : moves)
-            if (move.getTo() == l) {
-                ret = true;
-                return false;
-            }
+        if (d == 0)
+            continue;
+
+        if (sq.isOccupied()) {
+            auto piece = sq.getPiece();
+
+            if (piece->getColour() == attackingColour &&
+                isAttacking(d, piece->getPieceType()))
+                return true;
+
+            rayIter.nextRay();
+        }
+    }
+
+    return false;
+}
+
+bool Board::isSquareUnderAttack(Locus l, Colour attackingColour) const
+{
+    if (doRayAttackCheck(board_.getOrthogonalIterator(l),
+                         attackingColour,
+                         [](int d, PieceType type) -> bool
+        {
+            if (type == PieceType::QUEEN ||
+                type == PieceType::ROOK  ||
+                (type == PieceType::KING && d == 1))
+                return true;
+
+            return false;
+        }))
         return true;
-    });
 
-    return ret;
+    if (doRayAttackCheck(board_.getDiagonalIterator(l),
+                         attackingColour,
+                         [](int d, PieceType type) -> bool
+        {
+            if (type == PieceType::QUEEN            ||
+                type == PieceType::BISHOP           ||
+                (type == PieceType::KING && d == 2) ||
+                (type == PieceType::PAWN && d == 2))
+                return true;
+
+            return false;
+        }))
+        return true;
+
+    for (auto knightIter = board_.getKnightIterator(l);
+         knightIter != knightIter.end();
+         ++knightIter) {
+
+        auto &sq = *knightIter;
+        auto d = knightIter.getDistance();
+
+        if (d == 0)
+            continue;
+
+        if (sq.isOccupied() &&
+            sq.getPiece()->getColour() == attackingColour &&
+            sq.getPiece()->getPieceType() == PieceType::KNIGHT)
+            return true;
+    }
+
+    return false;
 }
 
 const bool Board::isInCheck(Colour kingsColour) const
