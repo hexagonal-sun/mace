@@ -82,7 +82,7 @@ moveList_t King::getCandidateMoves(const Board &b, Locus from) const
     moveList_t ret;
 
     auto cr = b.getCastlingRights();
-    const auto &mask = getCastlingMask(getColour());
+    const auto &colourMask = getCastlingMask(getColour());
 
     static const PieceMovementSpec kingMovementSpec = {
         {Direction::NORTH},
@@ -97,14 +97,14 @@ moveList_t King::getCandidateMoves(const Board &b, Locus from) const
 
     ret = applyTranslationSpec(b, from, kingMovementSpec, true);
 
-    if (!(cr & mask).any())
+    if (!(cr & colourMask).any())
         // No castling rights are open to us, just return king's
         // standard moves.
         return ret;
 
     addCastlingMoves(ret, getColour(), b, from,
-                     (mask & getKingSideMask()).any(),
-                     (mask & getQueenSideMask()).any());
+                     (cr & colourMask & getKingSideMask()).any(),
+                     (cr & colourMask & getQueenSideMask()).any());
 
     return ret;
 }
