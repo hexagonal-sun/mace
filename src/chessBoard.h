@@ -4,6 +4,13 @@
 #include "boardSquare.h"
 #include "locus.h"
 
+enum class Ray
+{
+    ORTHOGONAL,
+    DIAGONAL,
+    KNIGHT
+};
+
 class ChessBoard
 {
 public:
