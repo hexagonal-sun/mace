@@ -25,7 +25,7 @@ static const std::unordered_map<char, File> fileNames {
 
 
 Locus::Locus()
-    : idx_(0x80)
+    : idx_(0xff)
 {
 }
 
