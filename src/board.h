@@ -39,6 +39,7 @@ public:
     moveList_t getAllCandidateMoves(void);
     const BoardSquare & getSquare(std::string name) const;
     void printBoard(std::ostream &stream) const;
+    void printFEN(std::ostream &os) const;
     const BoardSquare & operator[](const Locus &l) const;
     bool isSquareUnderAttack(Locus l, Colour c) const;
     BoardSquare & operator[](const Locus &l);

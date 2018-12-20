@@ -291,6 +291,59 @@ Board Board::getStartingBoard()
     return constructFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }
 
+void Board::printFEN(std::ostream &os) const
+{
+    for (auto rank : RANKS) {
+        size_t numEmptyFiles = 0;
+
+        for (auto file : FILES)
+            if (board_[rank + file].isOccupied()) {
+                if (numEmptyFiles)
+                    os << numEmptyFiles;
+
+                board_[rank + file].getPiece()->printPiece(os);
+                numEmptyFiles = 0;
+
+            } else
+                numEmptyFiles++;
+
+        if (numEmptyFiles)
+            os << numEmptyFiles;
+
+        os << "/";
+    }
+
+    os << " ";
+    os << (getNextMoveColour() == Colour::WHITE ? "w" : "b");
+    os << " ";
+
+    bool havePrintedRights = false;
+
+    const auto cr = getCastlingRights();
+
+    for (Colour c : {Colour::WHITE, Colour::BLACK})
+        for (const auto kqMask : {getKingSideMask(), getQueenSideMask()})
+            if ((cr & getCastlingMask(c) & kqMask).any()) {
+                auto pchar = (kqMask == getKingSideMask() ? 'k' : 'q');
+
+                os << (char)(c == Colour::WHITE ? std::toupper(pchar) : pchar);
+
+                havePrintedRights = true;
+            }
+
+    if (!havePrintedRights)
+        os << "- ";
+    else
+        os << " ";
+
+    if (getEnPassantLocus().isValid())
+        os << getEnPassantLocus();
+    else
+        os << "-";
+
+    os << " 0 1\n";
+}
+
 Board Board::constructFromFEN(std::string fen)
 {
     std::vector<std::string> fields;
