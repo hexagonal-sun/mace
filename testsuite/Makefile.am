@@ -6,3 +6,4 @@ LDADD = $(top_builddir)/src/libmace.a
 TESTS = starting-position.perft position2.perft position3.perft
 TEST_EXTENSIONS = .perft
 PERFT_LOG_COMPILER = ./perft-tester
+EXTRA_DIST = $(TESTS)
