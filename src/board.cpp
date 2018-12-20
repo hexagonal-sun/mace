@@ -371,23 +371,26 @@ Board Board::constructFromFEN(std::string fen)
     Board board(turn);
     CastlingRights cr;
 
-    for (const auto castlingField : fields[2])
-        switch (castlingField) {
-        case 'K':
-            cr.set(WhiteKingSideBit);
-            break;
-        case 'Q':
-            cr.set(WhiteQueenSideBit);
-            break;
-        case 'k':
-            cr.set(BlackKingSideBit);
-            break;
-        case 'q':
-            cr.set(BlackQueenSideBit);
-            break;
-        default:
-            throw std::invalid_argument("Castling rights specifier has unexpected char");
-        }
+    if (fields[2] == "-")
+        cr.reset();
+    else
+        for (const auto castlingField : fields[2])
+            switch (castlingField) {
+            case 'K':
+                cr.set(WhiteKingSideBit);
+                break;
+            case 'Q':
+                cr.set(WhiteQueenSideBit);
+                break;
+            case 'k':
+                cr.set(BlackKingSideBit);
+                break;
+            case 'q':
+                cr.set(BlackQueenSideBit);
+                break;
+            default:
+                throw std::invalid_argument("Castling rights specifier has unexpected char");
+            }
 
     board.getCastlingRights() = cr;
 
