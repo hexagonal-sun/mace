@@ -120,11 +120,19 @@ bool Board::isSquareUnderAttack(Locus l, Colour attackingColour) const
                 auto piece = sq.getPiece();
                 auto type = piece->getPieceType();
 
+                // This is the direction (y-component) that this
+                // square can be attacked from by a pawn.  Notice that
+                // this component depends upon the colour of the pawn.
+                auto pawnTakeDirection = attackingColour == Colour::WHITE ?
+                    Direction::SOUTH() : Direction::NORTH();
+
                 if (piece->getColour() == attackingColour &&
                     (type == PieceType::QUEEN            ||
                      type == PieceType::BISHOP           ||
                      (type == PieceType::KING && distance == 1) ||
-                     (type == PieceType::PAWN && distance == 1)))
+                     (type == PieceType::PAWN && distance == 1
+                      && (diagDirection == pawnTakeDirection + Direction::EAST() ||
+                          diagDirection == pawnTakeDirection + Direction::WEST()))))
                     return true;
 
                 break;
