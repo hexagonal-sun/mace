@@ -20,6 +20,7 @@ src/Makefile
 src/Makefile.in
 src/*.o
 src/mace
+src/perft-splitter
 *~
 stamp-h1
 src/libmace.a

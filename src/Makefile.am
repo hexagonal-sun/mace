@@ -10,4 +10,6 @@ move.hpp castlingRights.hpp colour.hpp direction.hpp			\
 movementTypes.hpp
 
 bin_PROGRAMS = mace
+EXTRA_PROGRAMS = perft-splitter
+
 LDADD = libmace.a
