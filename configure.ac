@@ -34,6 +34,7 @@ AX_CXX_COMPILE_STDCXX_17(, [mandatory])
 
 # Checks for library functions.
 AC_CONFIG_FILES([Makefile
-                 src/Makefile])
+                 src/Makefile
+                 testsuite/Makefile])
 
 AC_OUTPUT
