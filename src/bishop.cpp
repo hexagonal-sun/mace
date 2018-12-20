@@ -1,3 +1,4 @@
+#include "board.h"
 #include "bishop.h"
 
 Bishop::Bishop(Colour col)
@@ -7,14 +8,7 @@ Bishop::Bishop(Colour col)
 
 moveList_t Bishop::getCandidateMoves(const Board &b, Locus from) const
 {
-    static const PieceMovementSpec bishopSpec = {
-        {Direction::NORTH, Direction::EAST},
-        {Direction::NORTH, Direction::WEST},
-        {Direction::SOUTH, Direction::EAST},
-        {Direction::SOUTH, Direction::WEST}
-    };
-
-    return applyTranslationSpec(b, from, bishopSpec, false);
+    return applyTranslationSpec(b, from, diagonalMoves, false);
 }
 
 void Bishop::printPiece(std::ostream &stream) const

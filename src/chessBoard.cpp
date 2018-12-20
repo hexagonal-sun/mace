@@ -61,38 +61,14 @@ ChessBoard::cend() const
     return ChessBoard::iterator<BoardSquare const>(&b_[128]);
 }
 
-ChessBoard::orthogonal_ray_iterator
-ChessBoard::getOrthogonalIterator(Locus l)
+ChessBoard::ray_iterator
+ChessBoard::getRayIterator(Locus l, Direction d)
 {
-    return orthogonal_ray_iterator(*this, l);
+    return ray_iterator(*this, l, d);
 }
 
-ChessBoard::const_orthogonal_ray_iterator
-ChessBoard::getOrthogonalIterator(Locus l) const
+ChessBoard::const_ray_iterator
+ChessBoard::getRayIterator(Locus l, Direction d) const
 {
-    return const_orthogonal_ray_iterator(*this, l);
-}
-
-ChessBoard::diagonal_ray_iterator
-ChessBoard::getDiagonalIterator(Locus l)
-{
-    return diagonal_ray_iterator(*this, l);
-}
-
-ChessBoard::const_diagonal_ray_iterator
-ChessBoard::getDiagonalIterator(Locus l) const
-{
-    return const_diagonal_ray_iterator(*this, l);
-}
-
-ChessBoard::knight_ray_iterator
-ChessBoard::getKnightIterator(Locus l)
-{
-    return knight_ray_iterator(*this, l);
-}
-
-ChessBoard::const_knight_ray_iterator
-ChessBoard::getKnightIterator(Locus l) const
-{
-    return const_knight_ray_iterator(*this, l);
+    return const_ray_iterator(*this, l, d);
 }

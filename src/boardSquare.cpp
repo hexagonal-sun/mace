@@ -1,4 +1,5 @@
 #include "boardSquare.h"
+#include "board.h"
 #include "piece.h"
 
 BoardSquare::BoardSquare()

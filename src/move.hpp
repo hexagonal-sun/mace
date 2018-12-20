@@ -2,7 +2,6 @@
 
 #include <boost/container/small_vector.hpp>
 #include "locus.h"
-#include "piece.h"
 
 enum class MoveType
 {

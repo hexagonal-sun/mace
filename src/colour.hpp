@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 enum class Colour
 {
     WHITE = 0,

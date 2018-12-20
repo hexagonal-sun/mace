@@ -1,7 +1,7 @@
 #pragma once
 #include <bitset>
 
-#include "piece.h"
+#include "colour.hpp"
 
 auto constexpr WhiteKingSideBit  = 0;
 auto constexpr BlackKingSideBit  = 1;

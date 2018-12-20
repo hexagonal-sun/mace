@@ -1,5 +1,6 @@
 #include <iostream>
 #include "board.h"
+#include "piece.h"
 #include "search.h"
 #include "mover.hpp"
 

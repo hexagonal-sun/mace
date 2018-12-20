@@ -1,3 +1,4 @@
+#include "board.h"
 #include "king.h"
 #include "move.hpp"
 #include "castlingRights.hpp"
@@ -19,7 +20,7 @@ static void genCastlingMove(moveList_t &moves,
     auto opponentsColour = ~ourColour;
 
     while (1) {
-        l = l.translate(d);
+        l += d;
 
         if (!l.isValid())
             throw std::logic_error("Attempted to castle when rook isn't present");
@@ -41,7 +42,7 @@ static void genCastlingMove(moveList_t &moves,
         if (!(l.getFile() == File::A || l.getFile() == File::H))
             return;
 
-        auto castlingKingsLocus = from.translate(d).translate(d);
+        auto castlingKingsLocus = from + d + d;
 
         // Ensure that the squares the king will travel
         // through aren't under attack.
@@ -50,8 +51,8 @@ static void genCastlingMove(moveList_t &moves,
         // is being attacked as that move will be discarded by
         // getAllCandidateMoves ensuring that we can't move the king
         // into check.
-        if (b.isSquareUnderAttack(from,               opponentsColour) ||
-            b.isSquareUnderAttack(from.translate(d),  opponentsColour))
+        if (b.isSquareUnderAttack(from,      opponentsColour) ||
+            b.isSquareUnderAttack(from + d,  opponentsColour))
             return;
 
         // We can legally now castle.
@@ -69,11 +70,11 @@ static void addCastlingMoves(moveList_t &moves,
                              bool canCastleQueenSide)
 {
     if (canCastleKingSide)
-        genCastlingMove(moves, ourColour, b, from, Direction::EAST,
+        genCastlingMove(moves, ourColour, b, from, Direction::EAST(),
                         MoveType::CASTLE_KINGSIDE);
 
     if (canCastleQueenSide)
-        genCastlingMove(moves, ourColour, b, from, Direction::WEST,
+        genCastlingMove(moves, ourColour, b, from, Direction::WEST(),
                         MoveType::CASTLE_QUEENSIDE);
 }
 
@@ -84,18 +85,7 @@ moveList_t King::getCandidateMoves(const Board &b, Locus from) const
     auto cr = b.getCastlingRights();
     const auto &colourMask = getCastlingMask(getColour());
 
-    static const PieceMovementSpec kingMovementSpec = {
-        {Direction::NORTH},
-        {Direction::EAST},
-        {Direction::SOUTH},
-        {Direction::WEST},
-        {Direction::NORTH, Direction::EAST},
-        {Direction::NORTH, Direction::WEST},
-        {Direction::SOUTH, Direction::EAST},
-        {Direction::SOUTH, Direction::WEST}
-    };
-
-    ret = applyTranslationSpec(b, from, kingMovementSpec, true);
+    ret = applyTranslationSpec(b, from, orthoDiagonalMoves, true);
 
     if (!(cr & colourMask).any())
         // No castling rights are open to us, just return king's

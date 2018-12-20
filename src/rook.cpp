@@ -1,3 +1,4 @@
+#include "board.h"
 #include "rook.h"
 
 Rook::Rook(Colour col)
@@ -7,14 +8,7 @@ Rook::Rook(Colour col)
 
 moveList_t Rook::getCandidateMoves(const Board &b, Locus from) const
 {
-    static const PieceMovementSpec rookSpec = {
-        {Direction::NORTH},
-        {Direction::EAST},
-        {Direction::SOUTH},
-        {Direction::WEST}
-    };
-
-    return applyTranslationSpec(b, from, rookSpec, false);
+    return applyTranslationSpec(b, from, orthogonalMoves, false);
 }
 
 void Rook::printPiece(std::ostream &stream) const

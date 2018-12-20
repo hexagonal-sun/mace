@@ -1,3 +1,4 @@
+#include "board.h"
 #include "queen.h"
 
 Queen::Queen(Colour col)
@@ -7,18 +8,7 @@ Queen::Queen(Colour col)
 
 moveList_t Queen::getCandidateMoves(const Board &b, Locus from) const
 {
-    static const PieceMovementSpec queenMovementSpec = {
-        {Direction::NORTH},
-        {Direction::EAST},
-        {Direction::SOUTH},
-        {Direction::WEST},
-        {Direction::NORTH, Direction::EAST},
-        {Direction::NORTH, Direction::WEST},
-        {Direction::SOUTH, Direction::EAST},
-        {Direction::SOUTH, Direction::WEST}
-    };
-
-    return applyTranslationSpec(b, from, queenMovementSpec, false);
+    return applyTranslationSpec(b, from, orthoDiagonalMoves, false);
 }
 
 void Queen::printPiece(std::ostream &stream) const

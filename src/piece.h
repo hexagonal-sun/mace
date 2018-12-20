@@ -7,7 +7,6 @@
 #include <locale>
 
 #include "colour.hpp"
-#include "board.h"
 #include "locus.h"
 #include "move.hpp"
 
@@ -23,8 +22,6 @@ enum class PieceType
     ROOK
 };
 
-typedef std::vector<std::vector<Direction>> PieceMovementSpec;
-
 class Board;
 
 class Piece
@@ -38,9 +35,45 @@ public:
     Colour getColour(void) const;
     bool operator==(const Piece &other) const;
 protected:
+    template <typename T, size_t N>
     moveList_t applyTranslationSpec(const Board &b, Locus &from,
-                                    const PieceMovementSpec &ms,
-                                    bool singularTransform) const;
+                                    const std::array<T, N> &ms,
+                                    bool singularTransform) const
+        {
+            moveList_t ret;
+
+            for (const auto &dir : ms)
+            {
+                Locus l = from;
+
+                while (1)
+                {
+                    l += dir;
+
+                    if (!l.isValid())
+                        goto nextDir;
+
+                    auto squareType = b[l].getSquareType(getColour());
+
+                    if (squareType == SquareType::OCCUPIED)
+                        goto nextDir;
+
+                    auto moveType = squareType == SquareType::EMPTY ?
+                        MoveType::UNOCCUPIED : MoveType::TAKE;
+
+                    ret.push_back(Move(from, l, moveType));
+
+                    if (singularTransform ||
+                        squareType == SquareType::TAKE)
+                    goto nextDir;
+                }
+
+            nextDir:;
+            }
+
+            return ret;
+        }
+
     char formatPieceChar(char pieceName) const;
 private:
     virtual unsigned int getValueMagnitude(void) const = 0;

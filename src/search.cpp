@@ -1,9 +1,10 @@
 #include <iostream>
 #include <climits>
 
+#include "board.h"
+#include "piece.h"
 #include "mover.hpp"
 #include "search.h"
-#include "piece.h"
 
 static int alphaBeta(Board &node, size_t depth,
                      int alpha, int beta,

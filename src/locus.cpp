@@ -71,26 +71,21 @@ size_t Locus::getIndex(void) const
     return idx_;
 }
 
-Locus Locus::translate(Direction d) const
-{
-    switch (d) {
-    case Direction::NORTH:
-        return Locus(idx_ + 0x10);
-    case Direction::SOUTH:
-        return Locus(idx_ - 0x10);
-    case Direction::EAST:
-        return Locus(idx_ + 0x01);
-    case Direction::WEST:
-        return Locus(idx_ - 0x01);
-    default:
-        throw std::invalid_argument("Unknown direction");
-    }
-
-}
-
 bool Locus::operator==(const Locus &other) const
 {
     return other.idx_ == idx_;
+}
+
+Locus Locus::operator+(const Direction d) const
+{
+    return Locus(idx_ + d.v_);
+}
+
+Locus &Locus::operator+=(const Direction d)
+{
+    idx_ += d.v_;
+
+    return *this;
 }
 
 std::ostream &operator<<(std::ostream &os, const Locus &l)

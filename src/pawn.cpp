@@ -1,3 +1,4 @@
+#include "board.h"
 #include "pawn.h"
 
 Pawn::Pawn(Colour col)
@@ -7,11 +8,11 @@ Pawn::Pawn(Colour col)
 
 moveList_t Pawn::getCandidateMoves(const Board &b, Locus from) const
 {
-    const auto dir = getColour() == Colour::WHITE ? Direction::NORTH : Direction::SOUTH;
+    const auto dir = getColour() == Colour::WHITE ? Direction::NORTH() : Direction::SOUTH();
     const auto startingRank = getColour() == Colour::WHITE ? Rank::TWO : Rank::SEVEN;
     moveList_t ret;
 
-    auto newLoc = from.translate(dir);
+    auto newLoc = from + dir;
 
     if (b[newLoc].getSquareType(getColour()) == SquareType::EMPTY) {
         ret.push_back(Move(from, newLoc, MoveType::UNOCCUPIED));
@@ -19,7 +20,7 @@ moveList_t Pawn::getCandidateMoves(const Board &b, Locus from) const
         // We can only move a pawn forward two squares if it isn't
         // obstructed at `newLoc' and it's on it's starting rank.
         if (from.getRank() == startingRank) {
-            auto doubleMove = newLoc.translate(dir);
+            auto doubleMove = newLoc + dir;
             if (b[doubleMove].getSquareType(getColour()) == SquareType::EMPTY)
                 ret.push_back(Move(from, doubleMove,
                                    MoveType::ENPASSANT_ADVANCE));
@@ -27,8 +28,8 @@ moveList_t Pawn::getCandidateMoves(const Board &b, Locus from) const
     }
 
     // See if we can take any pieces.
-    for (const auto &takeDir : {Direction::EAST, Direction::WEST}) {
-        const auto &takeLoc = from.translate(dir).translate(takeDir);
+    for (const auto takeDir : {Direction::EAST(), Direction::WEST()}) {
+        const auto takeLoc = from + dir + takeDir;
         auto enPassantRank = getColour() == Colour::WHITE ?
             Rank::FIVE : Rank::FOUR;
 

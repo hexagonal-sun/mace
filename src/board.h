@@ -7,12 +7,12 @@
 
 #include "boardSquare.h"
 #include "chessBoard.h"
-#include "piece.h"
 #include "move.hpp"
 #include "castlingRights.hpp"
 
 enum class Colour;
 enum class PieceType;
+class Piece;
 
 typedef std::function<bool(Piece *piece,
                            const moveList_t &)> moveCallback_t;

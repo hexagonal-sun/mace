@@ -2,6 +2,7 @@
 #include <vector>
 #include <ostream>
 #include <tuple>
+#include "direction.hpp"
 
 enum class Rank {
     ONE   = 0x00,
@@ -25,14 +26,6 @@ enum class File {
     H = 7,
 };
 
-enum class Direction {
-    NORTH,
-    EAST,
-    SOUTH,
-    WEST
-};
-
-
 static const std::vector<Rank> RANKS =
 {
     Rank::EIGHT, Rank::SEVEN, Rank::SIX, Rank::FIVE,
@@ -55,8 +48,9 @@ public:
     Rank getRank(void) const;
     bool isValid(void) const;
     File getFile(void) const;
-    Locus translate(Direction d) const;
     bool operator==(const Locus& other) const;
+    Locus operator+(const Direction d) const;
+    Locus &operator+=(const Direction d);
 private:
     Locus(int idx);
     uint8_t idx_;

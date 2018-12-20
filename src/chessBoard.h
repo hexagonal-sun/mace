@@ -4,13 +4,7 @@
 
 #include "boardSquare.h"
 #include "locus.h"
-
-enum class Ray
-{
-    ORTHOGONAL,
-    DIAGONAL,
-    KNIGHT
-};
+#include "movementTypes.hpp"
 
 class ChessBoard
 {
@@ -68,8 +62,7 @@ public:
     };
 
     template <typename ret_type,
-              typename chessboard_type,
-              Ray ray_type>
+              typename chessboard_type>
     class RayIterator
     {
         friend class ChessBoard;
@@ -89,140 +82,53 @@ public:
                 return manhattanDistance_;
             }
 
-        void nextRay()
-            {
-                if (ray_type == Ray::KNIGHT)
-                    throw std::logic_error("nextRay called for Knight ray");
-
-                setNextRay();
-            }
-
         void operator++()
             {
-                if (ray_type == Ray::KNIGHT) {
-                    manhattanDistance_ = 0;
-                    curLoc_ = originalLoc_;
-                }
-
-            nextDir:;
-                if (dirs_.empty()) {
-                    curLoc_ = Locus();
-                    return;
-                }
-
-                for (auto dir : dirs_.top()) {
-                    curLoc_ = curLoc_.translate(dir);
-                    manhattanDistance_ +=1;
-
-                    if (!curLoc_.isValid()) {
-
-                        setNextRay();
-
-                        goto nextDir;
-                    }
-                }
-
-                // For knight rays, we only want to apply the
-                // transformation once.
-                if (ray_type == Ray::KNIGHT)
-                    dirs_.pop();
+                curLoc_ += dir_;
             }
         bool operator==(const ChessBoard::RayIterator<ret_type,
-                                                      chessboard_type,
-                                                      ray_type> &other)
+                        chessboard_type> &other)
             {
-                return curLoc_ == other.curLoc_;
+                return !curLoc_.isValid();
             }
 
         bool operator!=(const ChessBoard::RayIterator<ret_type,
-                                                      chessboard_type,
-                                                      ray_type> &other)
+                        chessboard_type> &other)
             {
-                return (!(curLoc_ == other.curLoc_));
+                return curLoc_.isValid();
             }
 
-        ChessBoard::RayIterator<ret_type, chessboard_type, ray_type> end()
+        ChessBoard::RayIterator<ret_type, chessboard_type> end()
             {
                 return ChessBoard::RayIterator<ret_type,
-                                               chessboard_type,
-                                               ray_type>(cb_,
-                                                         Locus());
+                                               chessboard_type>
+                    (cb_, Locus(), dir_);
+            }
+
+        ChessBoard::RayIterator<ret_type, chessboard_type> begin()
+            {
+                return *this;
             }
     private:
-        RayIterator(chessboard_type &b, Locus l)
+        RayIterator(chessboard_type &b, Locus l, Direction d)
             : curLoc_(l),
               cb_(b),
               manhattanDistance_(0),
-              originalLoc_(l)
+              dir_(d)
             {
-                switch (ray_type) {
-                case Ray::ORTHOGONAL:
-                    dirs_ = std::stack<std::list<Direction>>({
-                            {Direction::NORTH},
-                            {Direction::EAST},
-                            {Direction::SOUTH},
-                            {Direction::WEST}
-                        });
-                    break;
-                case Ray::DIAGONAL:
-                    dirs_ = std::stack<std::list<Direction>>({
-                            {Direction::NORTH, Direction::EAST},
-                            {Direction::NORTH, Direction::WEST},
-                            {Direction::SOUTH, Direction::EAST},
-                            {Direction::SOUTH, Direction::WEST}
-                        });
-                    break;
-                case Ray::KNIGHT:
-                    dirs_ = std::stack<std::list<Direction>>({
-                            {Direction::NORTH, Direction::NORTH, Direction::EAST},
-                            {Direction::NORTH, Direction::NORTH, Direction::WEST},
-                            {Direction::EAST, Direction::EAST, Direction::NORTH},
-                            {Direction::EAST, Direction::EAST, Direction::SOUTH},
-                            {Direction::SOUTH, Direction::SOUTH, Direction::EAST},
-                            {Direction::SOUTH, Direction::SOUTH, Direction::WEST},
-                            {Direction::WEST, Direction::WEST, Direction::NORTH},
-                            {Direction::WEST, Direction::WEST, Direction::SOUTH}
-                        });
-                    break;
-                default:
-                    throw std::invalid_argument("Unknown ray type");
-                }
+                curLoc_ += d;
             };
 
-        void setNextRay(void)
-            {
-                curLoc_ = originalLoc_;
-                manhattanDistance_ = 0;
-                dirs_.pop();
-            }
-
-        const Locus originalLoc_;
+        Direction dir_;
         Locus curLoc_;
         chessboard_type &cb_;
         uint8_t manhattanDistance_;
-        std::stack<std::list<Direction>> dirs_;
     };
 
     typedef ChessBoard::RayIterator<BoardSquare,
-                                    ChessBoard,
-                                    Ray::ORTHOGONAL> orthogonal_ray_iterator;
+                                    ChessBoard> ray_iterator;
     typedef ChessBoard::RayIterator<BoardSquare const,
-                                    ChessBoard const,
-                                    Ray::ORTHOGONAL> const_orthogonal_ray_iterator;
-
-    typedef ChessBoard::RayIterator<BoardSquare,
-                                    ChessBoard,
-                                    Ray::DIAGONAL> diagonal_ray_iterator;
-    typedef ChessBoard::RayIterator<BoardSquare const,
-                                    ChessBoard const,
-                                    Ray::DIAGONAL> const_diagonal_ray_iterator;
-
-    typedef ChessBoard::RayIterator<BoardSquare,
-                                    ChessBoard,
-                                    Ray::KNIGHT> knight_ray_iterator;
-    typedef ChessBoard::RayIterator<BoardSquare const,
-                                    ChessBoard const,
-                                    Ray::KNIGHT> const_knight_ray_iterator;
+                                    ChessBoard const> const_ray_iterator;
 
     ChessBoard::iterator<BoardSquare> begin();
     ChessBoard::iterator<BoardSquare> end() ;
@@ -230,12 +136,9 @@ public:
     ChessBoard::iterator<BoardSquare const> end() const;
     ChessBoard::iterator<BoardSquare const> cbegin() const;
     ChessBoard::iterator<BoardSquare const> cend() const;
-    orthogonal_ray_iterator getOrthogonalIterator(Locus l);
-    const_orthogonal_ray_iterator getOrthogonalIterator(Locus l) const;
-    diagonal_ray_iterator getDiagonalIterator(Locus l);
-    const_diagonal_ray_iterator getDiagonalIterator(Locus l) const;
-    knight_ray_iterator getKnightIterator(Locus l);
-    const_knight_ray_iterator getKnightIterator(Locus l) const;
+    ray_iterator getRayIterator(Locus l, Direction d);
+    const_ray_iterator getRayIterator(Locus l, Direction d) const;
+
 
 private:
     std::array<BoardSquare, 128> b_;

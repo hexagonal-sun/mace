@@ -87,70 +87,60 @@ locusList_t Board::locatePiece(Colour c, PieceType t) const
     return ret;
 }
 
-template <typename RayIterType>
-static inline bool doRayAttackCheck(RayIterType &&rayIter,
-                                    Colour attackingColour,
-                                    std::function<bool(int, PieceType)> isAttacking)
+bool Board::isSquareUnderAttack(Locus l, Colour attackingColour) const
 {
-    for (; rayIter != rayIter.end(); ++rayIter) {
-        auto sq = *rayIter;
-        auto d = rayIter.getDistance();
+    for (const auto orthoDirection : orthogonalMoves) {
 
-        if (d == 0)
-            continue;
+        int distance = 1;
 
-        if (sq.isOccupied()) {
-            auto piece = sq.getPiece();
+        for (auto sq : board_.getRayIterator(l, orthoDirection)) {
+            if (sq.isOccupied()) {
+                auto piece = sq.getPiece();
+                auto type = piece->getPieceType();
 
-            if (piece->getColour() == attackingColour &&
-                isAttacking(d, piece->getPieceType()))
-                return true;
+                if (piece->getColour() == attackingColour &&
+                    (type == PieceType::QUEEN ||
+                     type == PieceType::ROOK  ||
+                     (type == PieceType::KING && distance == 1)))
+                    return true;
 
-            rayIter.nextRay();
+                break;
+            }
+
+            distance++;
         }
     }
 
-    return false;
-}
+    for (const auto diagDirection : diagonalMoves) {
 
-bool Board::isSquareUnderAttack(Locus l, Colour attackingColour) const
-{
-    if (doRayAttackCheck(board_.getOrthogonalIterator(l),
-                         attackingColour,
-                         [](int d, PieceType type) -> bool
-        {
-            if (type == PieceType::QUEEN ||
-                type == PieceType::ROOK  ||
-                (type == PieceType::KING && d == 1))
-                return true;
+        int distance = 1;
 
-            return false;
-        }))
-        return true;
+        for (auto sq : board_.getRayIterator(l, diagDirection)) {
+            if (sq.isOccupied()) {
+                auto piece = sq.getPiece();
+                auto type = piece->getPieceType();
 
-    if (doRayAttackCheck(board_.getDiagonalIterator(l),
-                         attackingColour,
-                         [](int d, PieceType type) -> bool
-        {
-            if (type == PieceType::QUEEN            ||
-                type == PieceType::BISHOP           ||
-                (type == PieceType::KING && d == 2) ||
-                (type == PieceType::PAWN && d == 2))
-                return true;
+                if (piece->getColour() == attackingColour &&
+                    (type == PieceType::QUEEN            ||
+                     type == PieceType::BISHOP           ||
+                     (type == PieceType::KING && distance == 1) ||
+                     (type == PieceType::PAWN && distance == 1)))
+                    return true;
 
-            return false;
-        }))
-        return true;
+                break;
+            }
+            distance++;
+        }
+    }
 
-    for (auto knightIter = board_.getKnightIterator(l);
-         knightIter != knightIter.end();
-         ++knightIter) {
+    for (const auto knightDir : knightMoves)
+    {
+        const auto knightLoc = l + knightDir;
 
-        auto &sq = *knightIter;
-        auto d = knightIter.getDistance();
-
-        if (d == 0)
+        if (!knightLoc.isValid())
             continue;
+
+        auto sq = board_[knightLoc];
 
         if (sq.isOccupied() &&
             sq.getPiece()->getColour() == attackingColour &&
