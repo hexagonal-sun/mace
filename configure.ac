@@ -32,6 +32,8 @@ AC_TYPE_UINT8_T
 AC_CHECK_TYPES([ptrdiff_t])
 AX_CXX_COMPILE_STDCXX_17(, [mandatory])
 
+AX_APPEND_COMPILE_FLAGS([-flto -Wall -pedantic], [CXXFLAGS])
+
 # Checks for library functions.
 AC_CONFIG_FILES([Makefile
                  src/Makefile
