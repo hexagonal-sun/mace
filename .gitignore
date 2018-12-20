@@ -22,3 +22,10 @@ src/*.o
 src/mace
 *~
 stamp-h1
+src/libmace.a
+test-driver
+testsuite/.deps/
+testsuite/perft-tester
+testsuite/perft-tester.o
+testsuite/*.log
+testsuite/*.trs
