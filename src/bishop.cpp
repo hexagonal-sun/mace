@@ -1,6 +1,6 @@
 #include "board.h"
 #include "bishop.h"
-#include "movementTypes.hpp"
+#include "moveTypes/diagonal.hpp"
 
 Bishop::Bishop(Colour col)
     : Piece(col)

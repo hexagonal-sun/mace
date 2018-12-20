@@ -2,7 +2,7 @@
 #include "king.h"
 #include "move.hpp"
 #include "castlingRights.hpp"
-#include "movementTypes.hpp"
+#include "moveTypes/orthodiagonal.hpp"
 
 King::King(Colour col)
     : Piece(col)

@@ -1,6 +1,6 @@
 #include "board.h"
 #include "knight.h"
-#include "movementTypes.hpp"
+#include "moveTypes/knight.hpp"
 
 Knight::Knight(Colour col)
     : Piece(col)

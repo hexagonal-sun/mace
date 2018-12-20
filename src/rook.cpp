@@ -1,6 +1,6 @@
 #include "board.h"
 #include "rook.h"
-#include "movementTypes.hpp"
+#include "moveTypes/orthogonal.hpp"
 
 Rook::Rook(Colour col)
     : Piece(col)

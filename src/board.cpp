@@ -13,7 +13,9 @@
 #include "bishop.h"
 #include "boardSquare.h"
 #include "mover.hpp"
-#include "movementTypes.hpp"
+#include "moveTypes/orthogonal.hpp"
+#include "moveTypes/diagonal.hpp"
+#include "moveTypes/knight.hpp"
 
 Board::Board(Colour nextMoveColour)
     : nextMoveColour_(nextMoveColour)
