@@ -21,6 +21,11 @@ public:
             v_ += other.v_;
         }
 
+    bool operator==(const Direction &other) const
+        {
+            return v_ == other.v_;
+        }
+
     static constexpr Direction NORTH()
         {
             return Direction(0x10);
