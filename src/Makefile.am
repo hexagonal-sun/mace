@@ -1,3 +1,5 @@
+AM_DEFAULT_SOURCE_EXT = .cpp
+
 noinst_LIBRARIES = libmace.a
 
 libmace_a_SOURCES = board.h board.cpp boardSquare.h boardSquare.cpp	\
@@ -8,5 +10,4 @@ move.hpp castlingRights.hpp colour.hpp direction.hpp			\
 movementTypes.hpp
 
 bin_PROGRAMS = mace
-mace_SOURCES = main.cpp
-mace_LDADD = libmace.a
+LDADD = libmace.a
