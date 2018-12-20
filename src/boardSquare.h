@@ -27,7 +27,7 @@ public:
     Piece *getPiece(void) const;
     bool operator==(const BoardSquare &other) const;
 private:
-    bool isOccupied_;
     Locus loc_;
+    bool isOccupied_;
     Piece *piece_;
 };

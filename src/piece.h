@@ -28,6 +28,7 @@ class Piece
 {
 public:
     Piece(Colour colour);
+    virtual ~Piece() = default;
     virtual moveList_t getCandidateMoves(const Board &b, Locus l) const = 0;
     virtual void printPiece(std::ostream &stream) const = 0;
     virtual PieceType getPieceType(void) const  = 0;

@@ -13,6 +13,7 @@
 #include "bishop.h"
 #include "boardSquare.h"
 #include "mover.hpp"
+#include "movementTypes.hpp"
 
 Board::Board(Colour nextMoveColour)
     : nextMoveColour_(nextMoveColour)

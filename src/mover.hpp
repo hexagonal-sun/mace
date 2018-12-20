@@ -133,11 +133,12 @@ public:
                 movingPiece = promotedPawn_;
             }
 
-            if (takenPiece)
+            if (takenPiece){
                 if (move_.getType() == MoveType::ENPASSANT_TAKE)
                     board_[enPassantTake_].setPiece(takenPiece);
                 else
                     sourceSquare.setPiece(takenPiece);
+            }
 
             if (movingPiece->getPieceType() == PieceType::KING)
                 board_.getKingLocus(movingPiece->getColour()) = move_.getFrom();
@@ -167,12 +168,12 @@ private:
             return Locus(enPassantRank, file);
         }
     const Move &move_;
-    CastlingRights castlingRights_;
-    Locus enPassantCapture_;
     Board &board_;
+    Piece *takenPiece;
+    Locus enPassantCapture_;
+    CastlingRights castlingRights_;
+    Piece *promotedPawn_;
     Locus enPassantTake_;
     Locus castlingRookSource_;
     Locus castlingRookDest_;
-    Piece *takenPiece;
-    Piece *promotedPawn_;
 };

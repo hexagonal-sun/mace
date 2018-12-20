@@ -4,7 +4,6 @@
 
 #include "boardSquare.h"
 #include "locus.h"
-#include "movementTypes.hpp"
 
 class ChessBoard
 {
@@ -56,9 +55,9 @@ public:
                 return ptr_ != other.ptr_;
             }
     private:
-        T *ptr_;
-        int rankCount_;
         uint8_t curIdx_;
+        int rankCount_;
+        T *ptr_;
     };
 
     template <typename ret_type,
@@ -119,10 +118,10 @@ public:
                 curLoc_ += d;
             };
 
-        Direction dir_;
         Locus curLoc_;
         chessboard_type &cb_;
         uint8_t manhattanDistance_;
+        Direction dir_;
     };
 
     typedef ChessBoard::RayIterator<BoardSquare,

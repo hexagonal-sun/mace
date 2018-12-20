@@ -32,10 +32,10 @@ public:
     const bool isValid() const { return isValid_; };
 
 private:
-    bool isValid_;
     Locus from_;
     Locus to_;
     MoveType type_;
+    bool isValid_;
 };
 
 static inline std::ostream &operator<<(std::ostream &os, const Move &l)

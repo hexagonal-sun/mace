@@ -54,11 +54,12 @@ moveList_t Pawn::getCandidateMoves(const Board &b, Locus from) const
             ret.push_back(Move(from, takeLoc,
                                MoveType::ENPASSANT_TAKE));
 
-        if (b[takeLoc].getSquareType(getColour()) == SquareType::TAKE)
+        if (b[takeLoc].getSquareType(getColour()) == SquareType::TAKE) {
             if (takeLoc.getRank() == promotionRank)
                 addPawnPromotions(ret, from, takeLoc);
             else
                 ret.push_back(Move(from, takeLoc, MoveType::TAKE));
+        }
     }
 
     return ret;

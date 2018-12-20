@@ -61,9 +61,9 @@ Move searchMove(Board &b, size_t depth)
 
     Move m;
 
-    int result = alphaBeta(b, depth, alpha, beta,
-                           b.getNextMoveColour() == Colour::WHITE ? true : false,
-                           &m);
+    alphaBeta(b, depth, alpha, beta,
+              b.getNextMoveColour() == Colour::WHITE ? true : false,
+              &m);
 
     return m;
 }

@@ -1,5 +1,6 @@
 #include "board.h"
 #include "queen.h"
+#include "movementTypes.hpp"
 
 Queen::Queen(Colour col)
     : Piece(col)
