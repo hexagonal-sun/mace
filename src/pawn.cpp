@@ -6,16 +6,29 @@ Pawn::Pawn(Colour col)
 {
 }
 
+static void addPawnPromotions(moveList_t &ret, Locus from, Locus to)
+{
+    for (const auto promoType : {MoveType::PROMOTE_BISHOP,
+                                 MoveType::PROMOTE_KNIGHT,
+                                 MoveType::PROMOTE_QUEEN,
+                                 MoveType::PROMOTE_ROOK})
+        ret.push_back(Move(from, to, promoType));
+}
+
 moveList_t Pawn::getCandidateMoves(const Board &b, Locus from) const
 {
     const auto dir = getColour() == Colour::WHITE ? Direction::NORTH() : Direction::SOUTH();
+    const auto promotionRank = getColour() == Colour::WHITE ? Rank::EIGHT : Rank::ONE;
     const auto startingRank = getColour() == Colour::WHITE ? Rank::TWO : Rank::SEVEN;
     moveList_t ret;
 
     auto newLoc = from + dir;
 
     if (b[newLoc].getSquareType(getColour()) == SquareType::EMPTY) {
-        ret.push_back(Move(from, newLoc, MoveType::UNOCCUPIED));
+        if (newLoc.getRank() == promotionRank)
+            addPawnPromotions(ret, from, newLoc);
+        else
+            ret.push_back(Move(from, newLoc, MoveType::UNOCCUPIED));
 
         // We can only move a pawn forward two squares if it isn't
         // obstructed at `newLoc' and it's on it's starting rank.
@@ -42,7 +55,10 @@ moveList_t Pawn::getCandidateMoves(const Board &b, Locus from) const
                                MoveType::ENPASSANT_TAKE));
 
         if (b[takeLoc].getSquareType(getColour()) == SquareType::TAKE)
-            ret.push_back(Move(from, takeLoc, MoveType::TAKE));
+            if (takeLoc.getRank() == promotionRank)
+                addPawnPromotions(ret, from, takeLoc);
+            else
+                ret.push_back(Move(from, takeLoc, MoveType::TAKE));
     }
 
     return ret;
