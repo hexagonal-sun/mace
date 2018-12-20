@@ -1,5 +1,9 @@
 #pragma once
 #include "board.h"
+#include "bishop.h"
+#include "rook.h"
+#include "knight.h"
+#include "queen.h"
 
 class Mover
 {
@@ -7,7 +11,8 @@ public:
     Mover(const Move &m, Board &b)
         : move_(m), board_(b), takenPiece(nullptr),
           enPassantCapture_(b.getEnPassantLocus()),
-          castlingRights_(b.getCastlingRights())
+          castlingRights_(b.getCastlingRights()),
+          promotedPawn_(nullptr)
         {
             auto &sourceSquare = board_[move_.getFrom()];
             auto &destSquare = board_[move_.getTo()];
@@ -84,6 +89,31 @@ public:
                 enPassantTake_ = takenPieceLocus;
             }
 
+            Piece *promotionPiece = nullptr;
+
+            switch(move_.getType())
+            {
+            case MoveType::PROMOTE_BISHOP:
+                promotionPiece = new Bishop(movingPieceColour);
+                break;
+            case MoveType::PROMOTE_ROOK:
+                promotionPiece = new Rook(movingPieceColour);
+                break;
+            case MoveType::PROMOTE_KNIGHT:
+                promotionPiece = new Knight(movingPieceColour);
+                break;
+            case MoveType::PROMOTE_QUEEN:
+                promotionPiece = new Queen(movingPieceColour);
+                break;
+            default:
+                break;
+            }
+
+            if (promotionPiece) {
+                promotedPawn_ = destSquare.getPiece();
+                destSquare.setPiece(promotionPiece);
+            }
+
             board_.getNextMoveColour() = getOppositeColour(board_.getNextMoveColour());
         }
     ~Mover()
@@ -94,6 +124,14 @@ public:
 
             destSquare.setPiece(sourceSquare.getPiece());
             sourceSquare.setEmpty();
+
+            if (promotedPawn_) {
+                Piece *p = destSquare.getPiece();
+                destSquare.setEmpty();
+                delete p;
+                destSquare.setPiece(promotedPawn_);
+                movingPiece = promotedPawn_;
+            }
 
             if (takenPiece)
                 if (move_.getType() == MoveType::ENPASSANT_TAKE)
@@ -136,4 +174,5 @@ private:
     Locus castlingRookSource_;
     Locus castlingRookDest_;
     Piece *takenPiece;
+    Piece *promotedPawn_;
 };
