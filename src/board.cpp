@@ -197,8 +197,8 @@ moveList_t Board::getAllCandidateMoves(void)
 {
     moveList_t ret;
 
-    const auto nonCheckCallback = [&](Piece *piece,
-                                      const moveList_t &moves)
+    forEachPieceMoves(getNextMoveColour(), [&](Piece *piece,
+                                               const moveList_t &moves)
     {
         auto ourColour = getNextMoveColour();
 
@@ -209,26 +209,7 @@ moveList_t Board::getAllCandidateMoves(void)
         }
 
         return true;
-    };
-
-    const auto checkCallback = [&](Piece *piece,
-                                   const moveList_t &moves)
-    {
-        auto ourColour = getNextMoveColour();
-
-        for (const auto &move : moves) {
-            Mover m(move, *this);
-            if (!isInCheck(ourColour))
-                ret.push_back(move);
-        }
-
-        return true;
-    };
-
-    if (isInCheck(getNextMoveColour()))
-        forEachPieceMoves(getNextMoveColour(), checkCallback);
-    else
-        forEachPieceMoves(getNextMoveColour(), nonCheckCallback);
+    });
 
     return ret;
 }
