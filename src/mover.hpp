@@ -5,6 +5,13 @@
 #include "knight.h"
 #include "queen.h"
 
+enum class MoverType
+{
+    COMMIT,
+    REVERT
+};
+
+template<MoverType t>
 class Mover
 {
 public:
@@ -118,6 +125,9 @@ public:
         }
     ~Mover()
         {
+            if (t == MoverType::COMMIT)
+                return;
+
             auto &sourceSquare = board_[move_.getTo()];
             auto &destSquare = board_[move_.getFrom()];
             auto movingPiece = sourceSquare.getPiece();

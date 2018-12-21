@@ -203,7 +203,7 @@ moveList_t Board::getAllCandidateMoves(void)
         auto ourColour = getNextMoveColour();
 
         for (const auto &move : moves) {
-            Mover m(move, *this);
+            Mover<MoverType::REVERT> m(move, *this);
             if (!isInCheck(ourColour))
                 ret.push_back(move);
         }
@@ -252,7 +252,7 @@ int Board::perft(int depth, bool divide)
     int nodes = 0;
 
     for (const auto move : getAllCandidateMoves()) {
-        Mover m(move, *this);
+        Mover<MoverType::REVERT> m(move, *this);
 
         int moveNodes = perft(depth - 1, false);
 

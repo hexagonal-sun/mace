@@ -29,7 +29,7 @@ static int alphaBeta(Board &node, size_t depth,
     int val = (type == MinMax::MAX ? -INT_MAX : INT_MAX);
 
     for (const auto move : moves) {
-        Mover m(move, node);
+        Mover<MoverType::REVERT> m(move, node);
         int prevVal = val;
 
         if (type == MinMax::MAX) {

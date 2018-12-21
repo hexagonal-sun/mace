@@ -29,7 +29,7 @@ void doPerftSplit(Board &b, size_t perftSplit)
         doPerftSplit(b, perftSplit);
     }
 
-    Mover a(m, b);
+    Mover<MoverType::REVERT> a(m, b);
 
     doPerftSplit(b, perftSplit - 1);
 }
