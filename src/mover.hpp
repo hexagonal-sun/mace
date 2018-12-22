@@ -119,7 +119,12 @@ public:
             if (promotionPiece) {
                 promotedPawn_ = destSquare.getPiece();
                 destSquare.setPiece(promotionPiece);
+                board_.pieceCounts[PieceType::PAWN]--;
+                board_.pieceCounts[promotionPiece->getPieceType()]++;
             }
+
+            if (takenPiece)
+                board_.pieceCounts[takenPiece->getPieceType()]--;
 
             board_.getNextMoveColour() = getOppositeColour(board_.getNextMoveColour());
         }
@@ -138,9 +143,11 @@ public:
             if (promotedPawn_) {
                 Piece *p = destSquare.getPiece();
                 destSquare.setEmpty();
+                board_.pieceCounts[p->getPieceType()]--;
                 delete p;
                 destSquare.setPiece(promotedPawn_);
                 movingPiece = promotedPawn_;
+                board_.pieceCounts[PieceType::PAWN]++;
             }
 
             if (takenPiece){
@@ -148,6 +155,8 @@ public:
                     board_[enPassantTake_].setPiece(takenPiece);
                 else
                     sourceSquare.setPiece(takenPiece);
+
+                board_.pieceCounts[takenPiece->getPieceType()]++;
             }
 
             if (movingPiece->getPieceType() == PieceType::KING)

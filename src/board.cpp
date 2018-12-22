@@ -20,6 +20,13 @@
 Board::Board(Colour nextMoveColour)
     : nextMoveColour_(nextMoveColour)
 {
+    for (const auto pt : {PieceType::BISHOP,
+                          PieceType::KING,
+                          PieceType::KNIGHT,
+                          PieceType::PAWN,
+                          PieceType::QUEEN,
+                          PieceType::ROOK})
+        pieceCounts[pt] = 0;
 }
 
 const BoardSquare & Board::getSquare(std::string name) const
@@ -441,6 +448,8 @@ Board Board::constructFromFEN(std::string fen)
                 throw std::invalid_argument("Encountered unknown piece specification: " +
                                             pieceSpecString);
             }
+
+            board.pieceCounts[board[rank + file].getPiece()->getPieceType()]++;
 
             file = static_cast<File>(static_cast<int>(file) + 1);
         }

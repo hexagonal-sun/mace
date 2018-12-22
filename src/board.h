@@ -44,6 +44,7 @@ public:
     bool isSquareUnderAttack(Locus l, Colour c) const;
     BoardSquare & operator[](const Locus &l);
     int perft(int depth, bool divide);
+    std::map<PieceType, int> pieceCounts;
 private:
     Board(Colour nextMoveColour);
     CastlingRights castlingRights_;
