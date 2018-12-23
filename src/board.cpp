@@ -1,6 +1,7 @@
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <locale>
+#include <numeric>
 #include <iostream>
 #include <regex>
 
@@ -198,6 +199,29 @@ const BoardSquare & Board::operator[](const Locus &l) const
 BoardSquare & Board::operator[](const Locus &l)
 {
     return board_[l];
+}
+
+bool Board::isDraw() const
+{
+    auto totalPieces = std::accumulate(pieceCounts.begin(),
+                                       pieceCounts.end(),
+                                       0,
+                                       [](size_t cur, auto &elm)
+        {
+            return cur + elm.second;
+        });
+
+    // By definition if there are only two pieces remaining then they
+    // have to be kings, which is a draw in insufficient material.
+    if (totalPieces == 2)
+        return true;
+
+    if (totalPieces == 3 &&
+        (pieceCounts.at(PieceType::BISHOP) == 1 ||
+         pieceCounts.at(PieceType::KNIGHT) == 1))
+        return true;
+
+    return false;
 }
 
 moveList_t Board::getAllCandidateMoves(void)

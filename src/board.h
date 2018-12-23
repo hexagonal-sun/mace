@@ -36,6 +36,7 @@ public:
     CastlingRights &getCastlingRights(void);
     const Locus &getEnPassantLocus(void) const;
     Locus &getEnPassantLocus(void);
+    bool isDraw() const;
     moveList_t getAllCandidateMoves(void);
     const BoardSquare & getSquare(std::string name) const;
     void printBoard(std::ostream &stream) const;
