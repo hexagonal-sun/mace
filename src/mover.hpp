@@ -59,8 +59,20 @@ public:
                 board_.getCastlingRights() &= ~mask;
             }
 
-            // TODO: If a rook is captured, update the appropriate
-            // castling rights.
+            if (takenPiece &&
+                takenPiece->getPieceType() == PieceType::ROOK &&
+                (destSquare.getLocus().getFile() == File::A ||
+                 destSquare.getLocus().getFile() == File::H) &&
+                (destSquare.getLocus().getRank() ==
+                 (takenPiece->getColour() == Colour::WHITE ?
+                  Rank::ONE : Rank::EIGHT))) {
+                auto mask = getCastlingMask(takenPiece->getColour());
+
+                mask &= destSquare.getLocus().getFile() == File::A ?
+                    getQueenSideMask() : getKingSideMask();
+
+                board_.getCastlingRights() &= ~mask;
+            }
 
             if (move_.getType() == MoveType::CASTLE_KINGSIDE ||
                 move_.getType() == MoveType::CASTLE_QUEENSIDE) {
