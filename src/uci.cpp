@@ -5,6 +5,7 @@
 #include "search.h"
 #include "mover.hpp"
 #include "uci.h"
+#include "mcts.h"
 #include "config.h"
 
 void UCI::handleCommandUCI() const
@@ -57,9 +58,9 @@ void UCI::handleCommandPosition(std::string line)
 
 void UCI::handleCommandGo(std::string line)
 {
-    auto move = searchMove(b_, 6);
+    MCTS mcts(b_);
 
-    os_ << "bestmove " << move << "\n";
+    os_ << "bestmove " <<  mcts.selectMove(5000) << "\n";
 }
 
 void UCI::mainLoop()
