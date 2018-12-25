@@ -42,6 +42,24 @@ static inline std::ostream &operator<<(std::ostream &os, const Move &l)
 {
     os << l.getFrom() << l.getTo();
 
+    switch (l.getType())
+    {
+        case MoveType::PROMOTE_QUEEN:
+            os << "q";
+            break;
+        case MoveType::PROMOTE_ROOK:
+            os << "r";
+            break;
+        case MoveType::PROMOTE_BISHOP:
+            os << "b";
+            break;
+        case MoveType::PROMOTE_KNIGHT:
+            os << "n";
+            break;
+        default:
+            break;
+    }
+
     return os;
 }
 
