@@ -21,7 +21,7 @@
 Board::Board(Colour nextMoveColour)
     : nextMoveColour_(nextMoveColour)
 {
-    for (const auto pt : {PieceType::BISHOP,
+    for (const auto &pt : {PieceType::BISHOP,
                           PieceType::KING,
                           PieceType::KNIGHT,
                           PieceType::PAWN,
@@ -70,9 +70,9 @@ Move Board::validateMove(const Locus & from, const Locus &to)
 
 void Board::printBoard(std::ostream &stream) const
 {
-    for (const auto rank : RANKS)
+    for (const auto &rank : RANKS)
     {
-        for (const auto file : FILES) {
+        for (const auto &file : FILES) {
             board_.at(Locus(rank, file)).printSquare(stream);
 
             stream << " ";
@@ -100,11 +100,11 @@ locusList_t Board::locatePiece(Colour c, PieceType t) const
 
 bool Board::isSquareUnderAttack(Locus l, Colour attackingColour) const
 {
-    for (const auto orthoDirection : orthogonalMoves) {
+    for (const auto &orthoDirection : orthogonalMoves) {
 
         int distance = 1;
 
-        for (auto sq : board_.getRayIterator(l, orthoDirection)) {
+        for (const auto &sq : board_.getRayIterator(l, orthoDirection)) {
             if (sq.isOccupied()) {
                 auto piece = sq.getPiece();
                 auto type = piece->getPieceType();
@@ -122,11 +122,11 @@ bool Board::isSquareUnderAttack(Locus l, Colour attackingColour) const
         }
     }
 
-    for (const auto diagDirection : diagonalMoves) {
+    for (const auto &diagDirection : diagonalMoves) {
 
         int distance = 1;
 
-        for (auto sq : board_.getRayIterator(l, diagDirection)) {
+        for (const auto &sq : board_.getRayIterator(l, diagDirection)) {
             if (sq.isOccupied()) {
                 auto piece = sq.getPiece();
                 auto type = piece->getPieceType();
@@ -152,14 +152,14 @@ bool Board::isSquareUnderAttack(Locus l, Colour attackingColour) const
         }
     }
 
-    for (const auto knightDir : knightMoves)
+    for (const auto &knightDir : knightMoves)
     {
         const auto knightLoc = l + knightDir;
 
         if (!knightLoc.isValid())
             continue;
 
-        auto sq = board_[knightLoc];
+        const auto &sq = board_[knightLoc];
 
         if (sq.isOccupied() &&
             sq.getPiece()->getColour() == attackingColour &&
@@ -231,7 +231,7 @@ moveList_t Board::getAllCandidateMoves(void)
     forEachPieceMoves(getNextMoveColour(), [&](Piece *piece,
                                                const moveList_t &moves)
     {
-        auto ourColour = getNextMoveColour();
+        const auto ourColour = getNextMoveColour();
 
         for (const auto &move : moves) {
             Mover<MoverType::REVERT> m(move, *this);
@@ -282,7 +282,7 @@ int Board::perft(int depth, bool divide)
 
     int nodes = 0;
 
-    for (const auto move : getAllCandidateMoves()) {
+    for (const auto &move : getAllCandidateMoves()) {
         Mover<MoverType::REVERT> m(move, *this);
 
         int moveNodes = perft(depth - 1, false);
@@ -316,10 +316,10 @@ Board Board::getStartingBoard()
 
 void Board::printFEN(std::ostream &os) const
 {
-    for (auto rank : RANKS) {
+    for (const auto &rank : RANKS) {
         size_t numEmptyFiles = 0;
 
-        for (auto file : FILES)
+        for (const auto &file : FILES)
             if (board_[rank + file].isOccupied()) {
                 if (numEmptyFiles)
                     os << numEmptyFiles;
@@ -344,8 +344,8 @@ void Board::printFEN(std::ostream &os) const
 
     const auto cr = getCastlingRights();
 
-    for (Colour c : {Colour::WHITE, Colour::BLACK})
-        for (const auto kqMask : {getKingSideMask(), getQueenSideMask()})
+    for (const Colour &c : {Colour::WHITE, Colour::BLACK})
+        for (const auto &kqMask : {getKingSideMask(), getQueenSideMask()})
             if ((cr & getCastlingMask(c) & kqMask).any()) {
                 auto pchar = (kqMask == getKingSideMask() ? 'k' : 'q');
 
@@ -397,7 +397,7 @@ Board Board::constructFromFEN(std::string fen)
     if (fields[2] == "-")
         cr.reset();
     else
-        for (const auto castlingField : fields[2])
+        for (const auto &castlingField : fields[2])
             switch (castlingField) {
             case 'K':
                 cr.set(WhiteKingSideBit);
@@ -434,10 +434,10 @@ Board Board::constructFromFEN(std::string fen)
     auto numericRegex = std::regex("[1-8]");
     auto rank = Rank::EIGHT;
 
-    for (const auto boardRow : boardSpec) {
+    for (const auto &boardRow : boardSpec) {
         auto file = File::A;
 
-        for (const auto pieceSpec : boardRow) {
+        for (const auto &pieceSpec : boardRow) {
             auto pieceSpecString = std::string(1, pieceSpec);
             auto colour = std::isupper(pieceSpec) ? Colour::WHITE : Colour::BLACK;
 
