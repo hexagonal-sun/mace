@@ -3,7 +3,7 @@
 #include <array>
 #include "../direction.hpp"
 
-constexpr std::array orthoDiagonalMoves {
+constexpr std::array<Direction, 8> orthoDiagonalMoves {
     Direction::NORTH(),
     Direction::EAST(),
     Direction::SOUTH(),

@@ -3,7 +3,7 @@
 #include <array>
 #include "../direction.hpp"
 
-constexpr std::array knightMoves {
+constexpr std::array<Direction, 8> knightMoves {
     Direction::NORTH() + Direction::NORTH() + Direction::EAST(),
     Direction::NORTH() + Direction::NORTH() + Direction::WEST(),
     Direction::EAST() + Direction::EAST() + Direction::NORTH(),
