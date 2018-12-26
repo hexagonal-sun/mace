@@ -42,6 +42,7 @@ class Locus
 {
 public:
     Locus();
+    Locus(int idx);
     Locus(Rank r, File f);
     Locus(char rank, char file);
     size_t getIndex(void) const;
@@ -52,7 +53,6 @@ public:
     Locus operator+(const Direction d) const;
     Locus &operator+=(const Direction d);
 private:
-    Locus(int idx);
     uint8_t idx_;
 };
 

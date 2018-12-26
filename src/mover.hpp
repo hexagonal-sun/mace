@@ -1,9 +1,5 @@
 #pragma once
 #include "board.h"
-#include "bishop.h"
-#include "rook.h"
-#include "knight.h"
-#include "queen.h"
 
 enum class MoverType
 {
@@ -16,26 +12,23 @@ class Mover
 {
 public:
     Mover(const Move &m, Board &b)
-        : move_(m), board_(b), takenPiece(nullptr),
+        : move_(m), board_(b),
           enPassantCapture_(b.getEnPassantLocus()),
-          castlingRights_(b.getCastlingRights()),
-          promotedPawn_(nullptr)
+          castlingRights_(b.getCastlingRights())
         {
             auto &sourceSquare = board_[move_.getFrom()];
             auto &destSquare = board_[move_.getTo()];
-            auto movingPiece = sourceSquare.getPiece();
-            auto movingPieceColour = movingPiece->getColour();
+            auto movingPieceType = sourceSquare.getPieceType();
+            auto movingPieceColour = sourceSquare.getColour();
 
             b.getEnPassantLocus() = Locus();
 
-            if (destSquare.isOccupied())
-                takenPiece = destSquare.getPiece();
+            takenSquare = destSquare;
+            destSquare = sourceSquare;
+            sourceSquare = SquareState::UNOCCUPIED;
 
-            destSquare.setPiece(sourceSquare.getPiece());
-            sourceSquare.setEmpty();
-
-            if (movingPiece->getPieceType() == PieceType::KING) {
-                board_.getKingLocus(movingPiece->getColour()) = move_.getTo();
+            if (movingPieceType == PieceType::KING) {
+                board_.getKingLocus(movingPieceColour) = move_.getTo();
 
                 // Eliminate all castling rights for this particular
                 // colour on king moves.
@@ -45,7 +38,7 @@ public:
             }
 
             // Eliminate castling rights for rook moves.
-            if (movingPiece->getPieceType() == PieceType::ROOK &&
+            if (movingPieceType == PieceType::ROOK &&
                 (move_.getFrom().getFile() == File::A ||
                  move_.getFrom().getFile() == File::H))
             {
@@ -59,16 +52,16 @@ public:
                 board_.getCastlingRights() &= ~mask;
             }
 
-            if (takenPiece &&
-                takenPiece->getPieceType() == PieceType::ROOK &&
-                (destSquare.getLocus().getFile() == File::A ||
-                 destSquare.getLocus().getFile() == File::H) &&
-                (destSquare.getLocus().getRank() ==
-                 (takenPiece->getColour() == Colour::WHITE ?
+            if (takenSquare.isOccupied() &&
+                takenSquare.getPieceType() == PieceType::ROOK &&
+                (move_.getTo().getFile() == File::A ||
+                 move_.getTo().getFile() == File::H) &&
+                (move_.getTo().getRank() ==
+                 (takenSquare.getColour() == Colour::WHITE ?
                   Rank::ONE : Rank::EIGHT))) {
-                auto mask = getCastlingMask(takenPiece->getColour());
+                auto mask = getCastlingMask(takenSquare.getColour());
 
-                mask &= destSquare.getLocus().getFile() == File::A ?
+                mask &= move_.getTo().getFile() == File::A ?
                     getQueenSideMask() : getKingSideMask();
 
                 board_.getCastlingRights() &= ~mask;
@@ -87,8 +80,8 @@ public:
                     castlingRookDest_ = rank + File::D;
                 }
 
-                board_[castlingRookDest_].setPiece(board_[castlingRookSource_].getPiece());
-                board_[castlingRookSource_].setEmpty();
+                board_[castlingRookDest_] = board_[castlingRookSource_];
+                board_[castlingRookSource_] = SquareState::UNOCCUPIED;
 
                 // Clear all castling rights for this colour after
                 // castling has occurred.
@@ -103,40 +96,39 @@ public:
                 auto takenPieceLocus = enPassantTransform(m.getTo(),
                                                           movingPieceColour);
 
-                takenPiece = board_[takenPieceLocus].getPiece();
-                board_[takenPieceLocus].setEmpty();
+                takenSquare = board_[takenPieceLocus];
+                board_[takenPieceLocus] = SquareState::UNOCCUPIED;
                 enPassantTake_ = takenPieceLocus;
             }
 
-            Piece *promotionPiece = nullptr;
+            SquareState promoSquare;
 
             switch(move_.getType())
             {
             case MoveType::PROMOTE_BISHOP:
-                promotionPiece = new Bishop(movingPieceColour);
+                promoSquare = PieceType::BISHOP + movingPieceColour;
                 break;
             case MoveType::PROMOTE_ROOK:
-                promotionPiece = new Rook(movingPieceColour);
+                promoSquare = PieceType::ROOK + movingPieceColour;
                 break;
             case MoveType::PROMOTE_KNIGHT:
-                promotionPiece = new Knight(movingPieceColour);
+                promoSquare = PieceType::KNIGHT + movingPieceColour;
                 break;
             case MoveType::PROMOTE_QUEEN:
-                promotionPiece = new Queen(movingPieceColour);
+                promoSquare = PieceType::QUEEN + movingPieceColour;
                 break;
             default:
                 break;
             }
 
-            if (promotionPiece) {
-                promotedPawn_ = destSquare.getPiece();
-                destSquare.setPiece(promotionPiece);
+            if (promoSquare.isOccupied()) {
+                destSquare = promoSquare;
                 board_.pieceCounts[PieceType::PAWN]--;
-                board_.pieceCounts[promotionPiece->getPieceType()]++;
+                board_.pieceCounts[promoSquare.getPieceType()]++;
             }
 
-            if (takenPiece)
-                board_.pieceCounts[takenPiece->getPieceType()]--;
+            if (takenSquare.isOccupied())
+                board_.pieceCounts[takenSquare.getPieceType()]--;
 
             board_.getNextMoveColour() = getOppositeColour(board_.getNextMoveColour());
         }
@@ -147,38 +139,31 @@ public:
 
             auto &sourceSquare = board_[move_.getTo()];
             auto &destSquare = board_[move_.getFrom()];
-            auto movingPiece = sourceSquare.getPiece();
 
-            destSquare.setPiece(sourceSquare.getPiece());
-            sourceSquare.setEmpty();
+            destSquare = sourceSquare;
+            sourceSquare = SquareState::UNOCCUPIED;
 
-            if (promotedPawn_) {
-                Piece *p = destSquare.getPiece();
-                destSquare.setEmpty();
-                board_.pieceCounts[p->getPieceType()]--;
-                delete p;
-                destSquare.setPiece(promotedPawn_);
-                movingPiece = promotedPawn_;
+            if (isPromotion(move_.getType())) {
+                board_.pieceCounts[destSquare.getPieceType()]--;
+                destSquare = PieceType::PAWN + destSquare.getColour();
                 board_.pieceCounts[PieceType::PAWN]++;
             }
 
-            if (takenPiece){
-                if (move_.getType() == MoveType::ENPASSANT_TAKE)
-                    board_[enPassantTake_].setPiece(takenPiece);
-                else
-                    sourceSquare.setPiece(takenPiece);
+            if (move_.getType() == MoveType::ENPASSANT_TAKE)
+                board_[enPassantTake_] = takenSquare;
+            else
+                sourceSquare = takenSquare;
 
-                board_.pieceCounts[takenPiece->getPieceType()]++;
-            }
+            if (takenSquare.isOccupied())
+                board_.pieceCounts[takenSquare.getPieceType()]++;
 
-            if (movingPiece->getPieceType() == PieceType::KING)
-                board_.getKingLocus(movingPiece->getColour()) = move_.getFrom();
+            if (destSquare.getPieceType() == PieceType::KING)
+                board_.getKingLocus(destSquare.getColour()) = move_.getFrom();
 
             // Restore the rooks position on castling moves.
-            if (move_.getType() == MoveType::CASTLE_KINGSIDE ||
-                move_.getType() == MoveType::CASTLE_QUEENSIDE) {
-                board_[castlingRookSource_].setPiece(board_[castlingRookDest_].getPiece());
-                board_[castlingRookDest_].setEmpty();
+            if (isCastling(move_.getType())) {
+                board_[castlingRookSource_] = board_[castlingRookDest_];
+                board_[castlingRookDest_] = SquareState::UNOCCUPIED;
             }
 
 
@@ -200,10 +185,9 @@ private:
         }
     const Move &move_;
     Board &board_;
-    Piece *takenPiece;
+    SquareState takenSquare;
     Locus enPassantCapture_;
     CastlingRights castlingRights_;
-    Piece *promotedPawn_;
     Locus enPassantTake_;
     Locus castlingRookSource_;
     Locus castlingRookDest_;

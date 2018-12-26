@@ -1,17 +1,19 @@
+#include <tuple>
 #include <list>
 #include <stack>
 #include <array>
 
-#include "boardSquare.h"
+#include "colour.hpp"
 #include "locus.h"
+#include "pieceType.hpp"
+#include "squareState.hpp"
 
 class ChessBoard
 {
 public:
-    ChessBoard();
-    const BoardSquare &operator[](const Locus &l) const;
-    BoardSquare &operator[](const Locus &l);
-    const BoardSquare &at(const Locus &l) const;
+    const SquareState &operator[](const Locus &l) const;
+    SquareState &operator[](const Locus &l);
+    const SquareState &at(const Locus &l) const;
 
     template <typename T>
     class iterator
@@ -23,14 +25,14 @@ public:
               ptr_(ptr)
             {};
 
-        T &operator*()
+        std::tuple<T, Locus> operator*()
             {
-                return *ptr_;
+                return std::tuple<T, Locus>(*ptr_, Locus(curIdx_));
             }
 
-        T &operator->()
+        std::tuple<T, Locus> operator->()
             {
-                return *ptr_;
+                return std::tuple<T, Locus>(*ptr_, Locus(curIdx_));
             }
 
         void operator++(void)
@@ -39,10 +41,12 @@ public:
 
                if (rankCount_ == 8) {
                     ptr_ += 8;
+                    curIdx_ += 8;
                     rankCount_ = 0;
                 }
 
                ptr_++;
+               curIdx_++;
             }
 
         bool operator==(const ChessBoard::iterator<T> &other)
@@ -124,21 +128,21 @@ public:
         Direction dir_;
     };
 
-    typedef ChessBoard::RayIterator<BoardSquare,
+    typedef ChessBoard::RayIterator<SquareState,
                                     ChessBoard> ray_iterator;
-    typedef ChessBoard::RayIterator<BoardSquare const,
+    typedef ChessBoard::RayIterator<SquareState const,
                                     ChessBoard const> const_ray_iterator;
 
-    ChessBoard::iterator<BoardSquare> begin();
-    ChessBoard::iterator<BoardSquare> end() ;
-    ChessBoard::iterator<BoardSquare const> begin() const;
-    ChessBoard::iterator<BoardSquare const> end() const;
-    ChessBoard::iterator<BoardSquare const> cbegin() const;
-    ChessBoard::iterator<BoardSquare const> cend() const;
+    ChessBoard::iterator<SquareState> begin();
+    ChessBoard::iterator<SquareState> end() ;
+    ChessBoard::iterator<SquareState const> begin() const;
+    ChessBoard::iterator<SquareState const> end() const;
+    ChessBoard::iterator<SquareState const> cbegin() const;
+    ChessBoard::iterator<SquareState const> cend() const;
     ray_iterator getRayIterator(Locus l, Direction d);
     const_ray_iterator getRayIterator(Locus l, Direction d) const;
 
 
 private:
-    std::array<BoardSquare, 128> b_;
+    std::array<SquareState, 128> b_;
 };

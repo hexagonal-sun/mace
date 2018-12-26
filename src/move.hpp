@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/container/small_vector.hpp>
 #include "locus.h"
 
 enum class MoveType
@@ -16,6 +15,26 @@ enum class MoveType
     PROMOTE_ROOK,
     TAKE
 };
+
+inline bool isPromotion(MoveType mt)
+{
+    if (mt == MoveType::PROMOTE_BISHOP ||
+        mt == MoveType::PROMOTE_KNIGHT ||
+        mt == MoveType::PROMOTE_QUEEN  ||
+        mt == MoveType::PROMOTE_ROOK)
+        return true;
+
+    return false;
+}
+
+inline bool isCastling(MoveType mt)
+{
+    if (mt == MoveType::CASTLE_KINGSIDE ||
+        mt == MoveType::CASTLE_QUEENSIDE)
+        return true;
+
+    return false;
+}
 
 class Move
 {
@@ -62,5 +81,3 @@ static inline std::ostream &operator<<(std::ostream &os, const Move &l)
 
     return os;
 }
-
-typedef boost::container::small_vector<Move, 64> moveList_t;

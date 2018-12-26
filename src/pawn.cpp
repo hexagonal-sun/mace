@@ -1,5 +1,4 @@
 #include "board.h"
-#include "pawn.h"
 
 Pawn::Pawn(Colour col)
     : Piece(col)

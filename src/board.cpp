@@ -6,14 +6,8 @@
 #include <regex>
 
 #include "board.h"
-#include "pawn.h"
-#include "rook.h"
-#include "knight.h"
-#include "queen.h"
-#include "king.h"
-#include "bishop.h"
-#include "boardSquare.h"
 #include "mover.hpp"
+#include "moveGen.h"
 #include "moveTypes/orthogonal.hpp"
 #include "moveTypes/diagonal.hpp"
 #include "moveTypes/knight.hpp"
@@ -30,7 +24,7 @@ Board::Board(Colour nextMoveColour)
         pieceCounts[pt] = 0;
 }
 
-const BoardSquare & Board::getSquare(std::string name) const
+const SquareState & Board::getSquare(std::string name) const
 {
     if (name.length() != 2)
         throw std::invalid_argument("square specifier of incorrect format");
@@ -43,7 +37,7 @@ const BoardSquare & Board::getSquare(std::string name) const
 
 Move Board::validateMove(std::string from, std::string to)
 {
-    return validateMove(getSquare(from).getLocus(), getSquare(to).getLocus());
+    return validateMove(Locus(from[1], from[0]), Locus(to[1], to[0]));
 }
 
 const Colour Board::getNextMoveColour(void) const
@@ -73,7 +67,7 @@ void Board::printBoard(std::ostream &stream) const
     for (const auto &rank : RANKS)
     {
         for (const auto &file : FILES) {
-            board_.at(Locus(rank, file)).printSquare(stream);
+            stream << board_.at(Locus(rank, file));
 
             stream << " ";
         }
@@ -88,11 +82,11 @@ locusList_t Board::locatePiece(Colour c, PieceType t) const
 {
     locusList_t ret;
 
-    for (const auto &square : board_) {
+    for (const auto [square, loc] : board_) {
         if (square.isOccupied() &&
-            square.getPiece()->getColour() == c &&
-            square.getPiece()->getPieceType() == t)
-            ret.push_back(square.getLocus());
+            square.getColour() == c &&
+            square.getPieceType() == t)
+            ret.push_back(loc);
     }
 
     return ret;
@@ -106,10 +100,9 @@ bool Board::isSquareUnderAttack(Locus l, Colour attackingColour) const
 
         for (const auto &sq : board_.getRayIterator(l, orthoDirection)) {
             if (sq.isOccupied()) {
-                auto piece = sq.getPiece();
-                auto type = piece->getPieceType();
+                auto type = sq.getPieceType();
 
-                if (piece->getColour() == attackingColour &&
+                if (sq.getColour() == attackingColour &&
                     (type == PieceType::QUEEN ||
                      type == PieceType::ROOK  ||
                      (type == PieceType::KING && distance == 1)))
@@ -128,8 +121,7 @@ bool Board::isSquareUnderAttack(Locus l, Colour attackingColour) const
 
         for (const auto &sq : board_.getRayIterator(l, diagDirection)) {
             if (sq.isOccupied()) {
-                auto piece = sq.getPiece();
-                auto type = piece->getPieceType();
+                auto type = sq.getPieceType();
 
                 // This is the direction (y-component) that this
                 // square can be attacked from by a pawn.  Notice that
@@ -137,7 +129,7 @@ bool Board::isSquareUnderAttack(Locus l, Colour attackingColour) const
                 auto pawnTakeDirection = attackingColour == Colour::WHITE ?
                     Direction::SOUTH() : Direction::NORTH();
 
-                if (piece->getColour() == attackingColour &&
+                if (sq.getColour() == attackingColour &&
                     (type == PieceType::QUEEN            ||
                      type == PieceType::BISHOP           ||
                      (type == PieceType::KING && distance == 1) ||
@@ -162,8 +154,8 @@ bool Board::isSquareUnderAttack(Locus l, Colour attackingColour) const
         const auto &sq = board_[knightLoc];
 
         if (sq.isOccupied() &&
-            sq.getPiece()->getColour() == attackingColour &&
-            sq.getPiece()->getPieceType() == PieceType::KNIGHT)
+            sq.getColour() == attackingColour &&
+            sq.getPieceType() == PieceType::KNIGHT)
             return true;
     }
 
@@ -183,20 +175,21 @@ const int Board::getEvaluation(void) const
 {
     int eval = 0;
 
-    for (const auto &square : board_) {
+    for (const auto [square, loc] : board_) {
         if (square.isOccupied())
-            eval += square.getPiece()->getValue();
+            // TODO: evaluation
+            eval += 0;
     }
 
     return eval;
 }
 
-const BoardSquare & Board::operator[](const Locus &l) const
+const SquareState & Board::operator[](const Locus &l) const
 {
     return board_.at(l);
 }
 
-BoardSquare & Board::operator[](const Locus &l)
+SquareState & Board::operator[](const Locus &l)
 {
     return board_[l];
 }
@@ -228,8 +221,7 @@ moveList_t Board::getAllCandidateMoves(void)
 {
     moveList_t ret;
 
-    forEachPieceMoves(getNextMoveColour(), [&](Piece *piece,
-                                               const moveList_t &moves)
+    forEachPieceMoves(getNextMoveColour(), [&](const moveList_t &moves)
     {
         const auto ourColour = getNextMoveColour();
 
@@ -298,12 +290,11 @@ int Board::perft(int depth, bool divide)
 
 void Board::forEachPieceMoves(Colour c, moveCallback_t callback) const
 {
-    for (const auto &square : board_) {
+    for (const auto [square, loc] : board_) {
         if (square.isOccupied() &&
-            square.getPiece()->getColour() == c) {
-            const auto pieceMoves = square.getPiece()->getCandidateMoves(*this,
-                                                                         square.getLocus());
-            if (!callback(square.getPiece(), pieceMoves))
+            square.getColour() == c) {
+            const auto pieceMoves = MoveGen::genMoves(*this, loc, square);
+            if (!callback(pieceMoves))
                 return;
         }
     }
@@ -324,7 +315,7 @@ void Board::printFEN(std::ostream &os) const
                 if (numEmptyFiles)
                     os << numEmptyFiles;
 
-                board_[rank + file].getPiece()->printPiece(os);
+                os << board_[rank + file];
                 numEmptyFiles = 0;
 
             } else
@@ -450,22 +441,22 @@ Board Board::constructFromFEN(std::string fen)
 
             switch (std::tolower(pieceSpec)) {
             case 'p':
-                board[Locus(rank, file)].setPiece(new Pawn(colour));
+                board[Locus(rank, file)] = PieceType::PAWN + colour;
                 break;
             case 'r':
-                board[Locus(rank, file)].setPiece(new Rook(colour));
+                board[Locus(rank, file)] = PieceType::ROOK + colour;
                 break;
             case 'n':
-                board[Locus(rank, file)].setPiece(new Knight(colour));
+                board[Locus(rank, file)] = PieceType::KNIGHT + colour;
                 break;
             case 'b':
-                board[Locus(rank, file)].setPiece(new Bishop(colour));
+                board[Locus(rank, file)] = PieceType::BISHOP + colour;
                 break;
             case 'q':
-                board[Locus(rank, file)].setPiece(new Queen(colour));
+                board[Locus(rank, file)] = PieceType::QUEEN + colour;
                 break;
             case 'k':
-                board[Locus(rank, file)].setPiece(new King(colour));
+                board[Locus(rank, file)] = PieceType::KING + colour;
                 board.getKingLocus(colour) = Locus(rank, file);
                 break;
             default:
@@ -473,7 +464,7 @@ Board Board::constructFromFEN(std::string fen)
                                             pieceSpecString);
             }
 
-            board.pieceCounts[board[rank + file].getPiece()->getPieceType()]++;
+            board.pieceCounts[board[rank + file].getPieceType()]++;
 
             file = static_cast<File>(static_cast<int>(file) + 1);
         }

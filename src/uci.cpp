@@ -58,9 +58,9 @@ void UCI::handleCommandPosition(std::string line)
 
 void UCI::handleCommandGo(std::string line)
 {
-    MCTS mcts(b_);
+    auto move = searchMove(b_, 5);
 
-    os_ << "bestmove " <<  mcts.selectMove(5000, b_) << "\n";
+    os_ << "bestmove " <<  move << "\n";
 }
 
 void UCI::mainLoop()

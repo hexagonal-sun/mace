@@ -5,17 +5,16 @@
 #include <functional>
 #include <vector>
 
-#include "boardSquare.h"
 #include "chessBoard.h"
 #include "move.hpp"
+#include "moveGen.h"
 #include "castlingRights.hpp"
 
 enum class Colour;
 enum class PieceType;
 class Piece;
 
-typedef std::function<bool(Piece *piece,
-                           const moveList_t &)> moveCallback_t;
+typedef std::function<bool(const moveList_t &)> moveCallback_t;
 
 typedef boost::container::small_vector<Locus, 8> locusList_t;
 
@@ -38,12 +37,12 @@ public:
     Locus &getEnPassantLocus(void);
     bool isDraw() const;
     moveList_t getAllCandidateMoves(void);
-    const BoardSquare & getSquare(std::string name) const;
+    const SquareState & getSquare(std::string name) const;
     void printBoard(std::ostream &stream) const;
     void printFEN(std::ostream &os) const;
-    const BoardSquare & operator[](const Locus &l) const;
+    const SquareState & operator[](const Locus &l) const;
+    SquareState & operator[](const Locus &l);
     bool isSquareUnderAttack(Locus l, Colour c) const;
-    BoardSquare & operator[](const Locus &l);
     int perft(int depth, bool divide);
     std::map<PieceType, int> pieceCounts;
 private:

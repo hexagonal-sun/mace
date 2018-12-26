@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <map>
 
 enum class Colour
