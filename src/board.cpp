@@ -52,7 +52,7 @@ Colour & Board::getNextMoveColour(void)
 
 Move Board::validateMove(const Locus & from, const Locus &to)
 {
-    const auto &allowedMoves = getAllCandidateMoves();
+    const auto &allowedMoves = MoveGen::getLegalMoves(*this);
 
     for (const auto &m : allowedMoves) {
         if (m.getFrom() == from && m.getTo() == to)
@@ -217,24 +217,14 @@ bool Board::isDraw() const
     return false;
 }
 
-moveList_t Board::getAllCandidateMoves(void)
+ChessBoard &Board::getChessBoard()
 {
-    moveList_t ret;
+    return board_;
+}
 
-    forEachPieceMoves(getNextMoveColour(), [&](const moveList_t &moves)
-    {
-        const auto ourColour = getNextMoveColour();
-
-        for (const auto &move : moves) {
-            Mover<MoverType::REVERT> m(move, *this);
-            if (!isInCheck(ourColour))
-                ret.push_back(move);
-        }
-
-        return true;
-    });
-
-    return ret;
+const ChessBoard &Board::getChessBoard() const
+{
+    return board_;
 }
 
 const Locus &Board::getKingLocus(Colour c) const
@@ -274,7 +264,7 @@ int Board::perft(int depth, bool divide)
 
     int nodes = 0;
 
-    for (const auto &move : getAllCandidateMoves()) {
+    for (const auto &move : MoveGen::getLegalMoves(*this)) {
         Mover<MoverType::REVERT> m(move, *this);
 
         int moveNodes = perft(depth - 1, false);
@@ -286,18 +276,6 @@ int Board::perft(int depth, bool divide)
     }
 
     return nodes;
-}
-
-void Board::forEachPieceMoves(Colour c, moveCallback_t callback) const
-{
-    for (const auto [square, loc] : board_) {
-        if (square.isOccupied() &&
-            square.getColour() == c) {
-            const auto pieceMoves = MoveGen::genMoves(*this, loc, square);
-            if (!callback(pieceMoves))
-                return;
-        }
-    }
 }
 
 Board Board::getStartingBoard()

@@ -12,5 +12,5 @@ typedef boost::container::small_vector<Move, 64> moveList_t;
 
 namespace MoveGen
 {
-    moveList_t genMoves(const Board &b, Locus from, SquareState sq);
+    moveList_t getLegalMoves(Board &);
 };

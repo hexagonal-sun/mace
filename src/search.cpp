@@ -21,7 +21,7 @@ static int alphaBeta(Board &node, size_t depth,
     if (depth == 0)
         return node.getEvaluation();
 
-    const auto &moves = node.getAllCandidateMoves();
+    const auto &moves = MoveGen::getLegalMoves(node);
 
     if (moves.size() == 0)
         return node.getNextMoveColour() == Colour::WHITE ? -1024 : 1024;

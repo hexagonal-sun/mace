@@ -2,7 +2,6 @@
 #include <array>
 #include <ostream>
 #include <array>
-#include <functional>
 #include <vector>
 
 #include "chessBoard.h"
@@ -13,8 +12,6 @@
 enum class Colour;
 enum class PieceType;
 class Piece;
-
-typedef std::function<bool(const moveList_t &)> moveCallback_t;
 
 typedef boost::container::small_vector<Locus, 8> locusList_t;
 
@@ -36,7 +33,8 @@ public:
     const Locus &getEnPassantLocus(void) const;
     Locus &getEnPassantLocus(void);
     bool isDraw() const;
-    moveList_t getAllCandidateMoves(void);
+    ChessBoard &getChessBoard();
+    const ChessBoard &getChessBoard() const;
     const SquareState & getSquare(std::string name) const;
     void printBoard(std::ostream &stream) const;
     void printFEN(std::ostream &os) const;
@@ -50,7 +48,6 @@ private:
     CastlingRights castlingRights_;
     Locus enPassantCapture_;
     std::array<Locus, 2> kingLocus_;
-    void forEachPieceMoves(Colour c, moveCallback_t callback) const;
     locusList_t locatePiece(Colour c, PieceType t) const;
     Colour nextMoveColour_;
     ChessBoard board_;

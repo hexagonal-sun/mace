@@ -39,14 +39,14 @@ MCTS::MCTSNode::MCTSNode(Board &b, Colour c, Move m, size_t depth,
 {
     Mover<MoverType::REVERT> mover(m, b);
 
-    unexploredMoves_ = b.getAllCandidateMoves();
+    unexploredMoves_ = MoveGen::getLegalMoves(b);
 }
 
 MCTS::MCTSNode::MCTSNode(Board &b)
     : ourColour_(b.getNextMoveColour()),
       visits_(0), wins_(0), depth_(0), id_(0)
 {
-    unexploredMoves_ = b.getAllCandidateMoves();
+    unexploredMoves_ = MoveGen::getLegalMoves(b);
 }
 
 Move
@@ -92,7 +92,7 @@ MCTS::MCTSNode::rollout(Move move, Board &b) const
     if (b.isDraw())
         return false;
 
-    auto candidateMoves = b.getAllCandidateMoves();
+    auto candidateMoves = MoveGen::getLegalMoves(b);
 
     if (candidateMoves.empty())
         return b.getNextMoveColour() == ourColour_ ? false : true;
