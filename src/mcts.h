@@ -11,7 +11,7 @@ public:
         {
         }
 
-    Move selectMove(size_t numIterations);
+    Move selectMove(size_t numIterations, Board &b);
     void dumpTree(std::string fileName) const;
 
 private:
@@ -21,7 +21,7 @@ private:
     {
     public:
         MCTSNode(Board &b);
-        bool MCTS();
+        bool MCTS(Board &b);
         bool operator<(const MCTSNode &other) const;
         Move getMove() const;
         void dumpNode(std::ostream &os) const;
@@ -30,15 +30,14 @@ private:
     private:
         MCTSNode(Board &b, Colour ourColour, Move m, size_t depth,
                  size_t id);
-        MCTSNode &expandChild();
+        MCTSNode &expandChild(Board &b);
         MCTSNode &selectChild();
-        bool doMCTS();
-        bool rollout(Move move) const;
+        bool doMCTS(Board &b);
+        bool rollout(Move move, Board &b) const;
         void updateStats(bool didWin);
         void addChild();
         float calcValue() const;
         float calcUCB() const;
-        Board &board_;
         Colour ourColour_;
         std::vector<MCTSNode> children_;
         moveList_t unexploredMoves_;

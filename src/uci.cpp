@@ -60,7 +60,7 @@ void UCI::handleCommandGo(std::string line)
 {
     MCTS mcts(b_);
 
-    os_ << "bestmove " <<  mcts.selectMove(5000) << "\n";
+    os_ << "bestmove " <<  mcts.selectMove(5000, b_) << "\n";
 }
 
 void UCI::mainLoop()

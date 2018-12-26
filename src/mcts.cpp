@@ -6,13 +6,13 @@
 
 static size_t totalSimulations = 0;
 
-Move MCTS::selectMove(size_t numIterations)
+Move MCTS::selectMove(size_t numIterations, Board &b)
 {
     totalSimulations = 0;
 
     while (numIterations--)
     {
-        root_.MCTS();
+        root_.MCTS(b);
         totalSimulations++;
     }
 
@@ -34,8 +34,7 @@ MCTS::dumpTree(std::string filename) const
 
 MCTS::MCTSNode::MCTSNode(Board &b, Colour c, Move m, size_t depth,
                          size_t id)
-    : board_(b), ourColour_(c), move_(m),
-      visits_(0), wins_(0), depth_(depth),
+    : ourColour_(c), move_(m), visits_(0), wins_(0), depth_(depth),
       id_(id)
 {
     Mover<MoverType::REVERT> mover(m, b);
@@ -44,7 +43,7 @@ MCTS::MCTSNode::MCTSNode(Board &b, Colour c, Move m, size_t depth,
 }
 
 MCTS::MCTSNode::MCTSNode(Board &b)
-    : board_(b), ourColour_(b.getNextMoveColour()),
+    : ourColour_(b.getNextMoveColour()),
       visits_(0), wins_(0), depth_(0), id_(0)
 {
     unexploredMoves_ = b.getAllCandidateMoves();
@@ -83,42 +82,42 @@ MCTS::MCTSNode::updateStats(bool didWin)
 }
 
 bool
-MCTS::MCTSNode::rollout(Move move) const
+MCTS::MCTSNode::rollout(Move move, Board &b) const
 {
     static std::random_device rd;
     static std::mt19937 gen(rd());
 
-    Mover<MoverType::REVERT> m(move, board_);
+    Mover<MoverType::REVERT> m(move, b);
 
-    if (board_.isDraw())
+    if (b.isDraw())
         return false;
 
-    auto candidateMoves = board_.getAllCandidateMoves();
+    auto candidateMoves = b.getAllCandidateMoves();
 
     if (candidateMoves.empty())
-        return board_.getNextMoveColour() == ourColour_ ? false : true;
+        return b.getNextMoveColour() == ourColour_ ? false : true;
 
     auto upperBound = candidateMoves.size() - 1;
 
     std::uniform_int_distribution<> dis(0, upperBound);
 
-    return rollout(candidateMoves[dis(gen)]);
+    return rollout(candidateMoves[dis(gen)], b);
 }
 
 bool
-MCTS::MCTSNode::doMCTS()
+MCTS::MCTSNode::doMCTS(Board &b)
 {
-    Mover<MoverType::REVERT> m(move_, board_);
+    Mover<MoverType::REVERT> m(move_, b);
 
-    return MCTS();
+    return MCTS(b);
 }
 
 bool
-MCTS::MCTSNode::MCTS()
+MCTS::MCTSNode::MCTS(Board &b)
 {
     // Phase 1: Descend.
     if (unexploredMoves_.empty()) {
-        bool result = selectChild().doMCTS();
+        bool result = selectChild().doMCTS(b);
 
         updateStats(result);
 
@@ -126,10 +125,10 @@ MCTS::MCTSNode::MCTS()
     }
 
     // Phase 2: Expand.
-    auto &newNode = expandChild();
+    auto &newNode = expandChild(b);
 
     // Phase 3: rollout.
-    bool result = newNode.rollout(newNode.getMove());
+    bool result = newNode.rollout(newNode.getMove(), b);
 
     // Phase 4: backprop.
     newNode.updateStats(result);
@@ -145,7 +144,7 @@ MCTS::MCTSNode::operator<(const MCTS::MCTSNode &other) const
 }
 
 MCTS::MCTSNode &
-MCTS::MCTSNode::expandChild()
+MCTS::MCTSNode::expandChild(Board &b)
 {
     static size_t nextId = 1;
 
@@ -156,8 +155,7 @@ MCTS::MCTSNode::expandChild()
 
     unexploredMoves_.pop_back();
 
-    children_.push_back(MCTS::MCTSNode(board_, ourColour_, m,
-                                       depth_ + 1, nextId++));
+    children_.push_back(MCTS::MCTSNode(b, ourColour_, m, depth_ + 1, nextId++));
 
     return children_.back();
 }
