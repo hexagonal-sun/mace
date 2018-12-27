@@ -16,7 +16,8 @@ enum class MinMax {
 class SearchResults
 {
     size_t depth_;
-    moveList_t pv_;
+    // moveList_t pv_;
+    Move bestMove_;
     int score_;
     size_t nodes_;
     TimePoint start_, end_;
@@ -66,18 +67,23 @@ public:
 
     Move getBestMove() const
         {
-            return pv_[0];
+            return bestMove_;
         }
 
-    moveList_t getPV() const
+    void setBestMove(Move m)
         {
-            return pv_;
+            bestMove_ = m;
         }
 
-    void setPV(const moveList_t &moves)
-        {
-            pv_ = moves;
-        }
+    // moveList_t getPV() const
+    //     {
+    //         return pv_;
+    //     }
+
+    // void setPV(const moveList_t &moves)
+    //     {
+    //         pv_ = moves;
+    //     }
 
     MinMax getSearchDir() const
         {

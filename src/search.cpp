@@ -6,8 +6,6 @@
 #include "moveStack.hpp"
 #include "search.h"
 
-static moveList_t moveStack;
-
 static int alphaBeta(Board &node, size_t depth,
                      int alpha, int beta,
                      SearchResults &res)
@@ -21,39 +19,38 @@ static int alphaBeta(Board &node, size_t depth,
         if (node.getNextMoveColour() == Colour::BLACK)
             eval = -eval;
 
-        if (res.getSearchDir() == MinMax::MAX &&
-            eval > res.getScore()) {
-            res.setScore(eval);
-            res.setPV(moveStack);
-        }
-
-        if (res.getSearchDir() == MinMax::MIN &&
-            eval < res.getScore()) {
-            res.setScore(eval);
-            res.setPV(moveStack);
-        }
-
         return eval;
     }
 
     const auto &moves = MoveGen::getLegalMoves(node);
 
-    if (moves.size() == 0)
-        return node.getNextMoveColour() == Colour::WHITE ? -1024 : 1024;
+    if (moves.size() == 0) {
+        if (node.isInCheck(node.getNextMoveColour()))
+            return -1024;
+        else
+            return 0;
+    }
 
     int val = -INT_MAX;
 
     for (const auto move : moves) {
         Mover<MoverType::REVERT> m(move, node);
-        MoveStack ms(moveStack, move);
 
         val = std::max(val, -alphaBeta(node, depth - 1,
                                        -beta, -alpha, res));
+
+        if (depth == res.getDepth()) {
+            if (val > alpha)
+                res.setBestMove(move);
+        }
+
         alpha = std::max(alpha, val);
         beta = std::min(beta, val);
 
         if (alpha >= beta)
             break;
+
+        }
     }
 
     return val;
