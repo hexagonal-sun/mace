@@ -56,9 +56,28 @@ void UCI::handleCommandPosition(std::string line)
     }
 }
 
+void UCI::dumpResults(SearchResults &results)
+{
+    os_ << "info depth " << results.getDepth()
+        << " nps " << results.getNPS()
+        << " nodes " << results.getNodes()
+        << " time " << results.getDuration<std::chrono::milliseconds>()
+        << " score cp " << results.getScore()
+        << " pv ";
+
+    for (const auto move : results.getPV())
+        os_ << move << " ";
+
+    os_ << "\n";
+}
+
 void UCI::handleCommandGo(std::string line)
 {
-    auto move = searchMove(b_, 5);
+    auto dumpResultsCallback = std::bind(&UCI::dumpResults, this,
+                                         std::placeholders::_1);
+
+    auto move = searchMove(b_, std::chrono::seconds(5),
+                           dumpResultsCallback);
 
     os_ << "bestmove " <<  move << "\n";
 }

@@ -1,25 +1,38 @@
-#include <iostream>
 #include <climits>
 
 #include "board.h"
 #include "piece.h"
 #include "mover.hpp"
+#include "moveStack.hpp"
 #include "search.h"
 
-enum class MinMax {
-    MIN,
-    MAX
-};
-
+static moveList_t moveStack;
 
 template <MinMax type>
 static int alphaBeta(Board &node, size_t depth,
                      int alpha, int beta,
-                     Move *bestMove)
+                     SearchResults &res)
 
 {
-    if (depth == 0)
-        return node.getEvaluation();
+    res.vistedNode();
+
+    if (depth == 0) {
+        auto eval = node.getEvaluation();
+
+        if (res.getSearchDir() == MinMax::MAX &&
+            eval > res.getScore()) {
+            res.setScore(eval);
+            res.setPV(moveStack);
+        }
+
+        if (res.getSearchDir() == MinMax::MIN &&
+            eval < res.getScore()) {
+            res.setScore(eval);
+            res.setPV(moveStack);
+        }
+
+        return eval;
+    }
 
     const auto &moves = MoveGen::getLegalMoves(node);
 
@@ -30,20 +43,18 @@ static int alphaBeta(Board &node, size_t depth,
 
     for (const auto move : moves) {
         Mover<MoverType::REVERT> m(move, node);
-        int prevVal = val;
+        MoveStack ms(moveStack, move);
+
 
         if (type == MinMax::MAX) {
             val = std::max(val, alphaBeta<MinMax::MIN>(node, depth - 1,
-                                                       alpha, beta, nullptr));
+                                                       alpha, beta, res));
             alpha = std::max(alpha, val);
         } else {
             val = std::min(val, alphaBeta<MinMax::MAX>(node, depth - 1,
-                                                       alpha, beta, nullptr));
+                                                       alpha, beta, res));
             beta = std::min(beta, val);
         }
-
-        if (bestMove && prevVal != val)
-            *bestMove = move;
 
         if (alpha >= beta)
             break;
@@ -52,16 +63,37 @@ static int alphaBeta(Board &node, size_t depth,
     return val;
 }
 
-Move searchMove(Board &b, size_t depth)
+static void doSearch(Board &b, SearchResults &results)
 {
     int alpha = -INT_MAX;
     int beta = INT_MAX;
-    Move m;
 
     auto searchFunc = b.getNextMoveColour() == Colour::WHITE ?
         alphaBeta<MinMax::MAX> : alphaBeta<MinMax::MIN>;
 
-    searchFunc(b, depth, alpha, beta, &m);
+    searchFunc(b, results.getDepth(), alpha, beta, results);
+}
 
-    return m;
+Move searchMove(Board &b, const Clock::duration timeLimit,
+                std::function<void(SearchResults &results)> dumpResults)
+{
+    const auto searchStart = Clock::now();
+    const auto searchEnd = searchStart + timeLimit;
+    const auto searchDirection = b.getNextMoveColour() == Colour::WHITE ?
+        MinMax::MAX : MinMax::MIN;
+    size_t depth = 1;
+
+    while (1)
+    {
+        SearchResults results(depth, searchDirection);
+
+        doSearch(b, results);
+        results.finishedSearch();
+        dumpResults(results);
+
+        if (Clock::now() > searchEnd)
+            return results.getBestMove();
+
+        depth++;
+    }
 }

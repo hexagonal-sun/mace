@@ -1,5 +1,6 @@
 #include <iostream>
 #include "board.h"
+#include "search.h"
 
 class UCI
 {
@@ -18,5 +19,6 @@ private:
     void handleCommandUCINewGame();
     void handleCommandPosition(std::string line);
     void handleCommandGo(std::string line);
+    void dumpResults(SearchResults &res);
     Board b_;
 };
