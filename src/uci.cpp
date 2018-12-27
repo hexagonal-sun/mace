@@ -58,11 +58,16 @@ void UCI::handleCommandPosition(std::string line)
 
 void UCI::dumpResults(SearchResults &results)
 {
+    auto score = results.getScore();
+
+    if (b_.getNextMoveColour() == Colour::BLACK)
+        score = -score;
+
     os_ << "info depth " << results.getDepth()
         << " nps " << results.getNPS()
         << " nodes " << results.getNodes()
         << " time " << results.getDuration<std::chrono::milliseconds>()
-        << " score cp " << results.getScore()
+        << " score cp " << score
         << " pv ";
 
     for (const auto move : results.getPV())
