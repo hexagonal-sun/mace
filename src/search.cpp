@@ -50,7 +50,7 @@ static int search(Board &node, size_t depth,
             return getPlayersEvaluation(node);
 
         if (node.isInCheck(node.getNextMoveColour()))
-            return -INT_MAX;
+            return -INT_MAX + ((res.getDepth() - depth) + 1);
         else
             return 0;
     }
