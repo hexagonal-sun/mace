@@ -75,8 +75,8 @@ void UCI::dumpResults(SearchResults &results)
         << " nps " << results.getNPS()
         << " nodes " << results.getNodes()
         << " time " << results.getDuration<std::chrono::milliseconds>()
-        << " score cp " << score;
-        // << " pv ";
+        << " score cp " << score
+        << " pv " << results.getBestMove();
 
     // for (const auto move : results.getPV())
     //     os_ << move << " ";
