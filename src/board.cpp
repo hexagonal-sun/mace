@@ -170,20 +170,6 @@ const bool Board::isInCheck(Colour kingsColour) const
                                getOppositeColour(kingsColour));
 }
 
-
-const int Board::getEvaluation(void) const
-{
-    int eval = 0;
-
-    for (const auto [square, loc] : board_) {
-        if (square.isOccupied())
-            // TODO: evaluation
-            eval += 0;
-    }
-
-    return eval;
-}
-
 const SquareState & Board::operator[](const Locus &l) const
 {
     return board_.at(l);

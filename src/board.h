@@ -24,7 +24,6 @@ public:
     Move validateMove(const Locus &from, const Locus &to);
     const Colour getNextMoveColour(void) const;
     Colour &getNextMoveColour(void);
-    const int getEvaluation(void) const;
     const bool isInCheck(Colour kingsColour) const;
     const Locus &getKingLocus(Colour c) const;
     Locus &getKingLocus(Colour c);

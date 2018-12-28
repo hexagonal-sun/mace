@@ -3,28 +3,53 @@
 #include "board.h"
 #include "piece.h"
 #include "mover.hpp"
+#include "evaluate.h"
 #include "moveStack.hpp"
 #include "search.h"
 
-static int alphaBeta(Board &node, size_t depth,
+enum class SearchType
+{
+    ALPHABETA,
+    QUIESCENT
+};
+
+static int getPlayersEvaluation(Board &node)
+{
+    auto eval = getEvaluation(node);
+
+    if (node.getNextMoveColour() == Colour::BLACK)
+        eval = -eval;
+
+    return eval;
+}
+
+template<SearchType type>
+static int search(Board &node, size_t depth,
                      int alpha, int beta,
                      SearchResults &res)
 
 {
     res.vistedNode();
 
-    if (depth == 0) {
-        auto eval = node.getEvaluation();
+    if (type == SearchType::ALPHABETA && depth == 0)
+        return search<SearchType::QUIESCENT>(node, depth,
+                                             alpha, beta, res);
 
-        if (node.getNextMoveColour() == Colour::BLACK)
-            eval = -eval;
+    auto moves = MoveGen::getLegalMoves(node);
 
-        return eval;
-    }
-
-    const auto &moves = MoveGen::getLegalMoves(node);
+    if (type == SearchType::QUIESCENT)
+        moves.erase(std::remove_if(moves.begin(),
+                                   moves.end(),
+                                   [&](const Move &move)
+    {
+        return !(move.getType() == MoveType::TAKE ||
+                 move.getType() == MoveType::ENPASSANT_TAKE);
+    }), moves.end());
 
     if (moves.size() == 0) {
+        if (type == SearchType::QUIESCENT)
+            return getPlayersEvaluation(node);
+
         if (node.isInCheck(node.getNextMoveColour()))
             return -1024;
         else
@@ -33,24 +58,33 @@ static int alphaBeta(Board &node, size_t depth,
 
     int val = -INT_MAX;
 
+    if (type == SearchType::QUIESCENT) {
+        val = getPlayersEvaluation(node);
+
+        alpha = std::max(alpha, val);
+
+        if (alpha >= beta)
+            return val;
+    }
+
     for (const auto move : moves) {
         Mover<MoverType::REVERT> m(move, node);
 
-        val = std::max(val, -alphaBeta(node, depth - 1,
-                                       -beta, -alpha, res));
+        val = std::max(val, -search<type>(node, depth - 1,
+                                          -beta, -alpha, res));
 
-        if (depth == res.getDepth()) {
-            if (val > alpha)
-                res.setBestMove(move);
+        if (type == SearchType::ALPHABETA &&
+            depth == res.getDepth() &&
+            val > alpha)
+        {
+            res.setBestMove(move);
+            res.setScore(val);
         }
 
         alpha = std::max(alpha, val);
-        beta = std::min(beta, val);
 
         if (alpha >= beta)
             break;
-
-        }
     }
 
     return val;
@@ -61,7 +95,8 @@ static void doSearch(Board &b, SearchResults &results)
     int alpha = -INT_MAX;
     int beta = INT_MAX;
 
-    alphaBeta(b, results.getDepth(), alpha, beta, results);
+    search<SearchType::ALPHABETA>(b, results.getDepth(),
+                                     alpha, beta, results);
 }
 
 Move searchMove(Board &b, const Clock::duration timeLimit,
