@@ -1,6 +1,5 @@
 #include <iostream>
 #include "board.h"
-#include "piece.h"
 #include "mover.hpp"
 
 void doPerftSplit(Board &b, size_t perftSplit)

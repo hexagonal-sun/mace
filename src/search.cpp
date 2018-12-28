@@ -1,7 +1,6 @@
 #include <climits>
 
 #include "board.h"
-#include "piece.h"
 #include "mover.hpp"
 #include "evaluate.h"
 #include "moveStack.hpp"
