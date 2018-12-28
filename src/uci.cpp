@@ -81,7 +81,7 @@ void UCI::dumpResults(SearchResults &results)
     // for (const auto move : results.getPV())
     //     os_ << move << " ";
 
-    os_ << "\n";
+    os_ << std::endl;
 }
 
 void UCI::handleCommandGo(std::string line)
