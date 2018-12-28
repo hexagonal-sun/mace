@@ -34,6 +34,14 @@ void UCI::handleCommandPosition(std::string line)
     boost::split(v, line, boost::is_any_of(" "));
     bool expectMove = false;
 
+    if (v[1] == "fen") {
+        std::string fenString = "";
+        for (size_t i = 2; i < (2 + 6); i++)
+            fenString += v[i] + " ";
+
+        b_ = Board::constructFromFEN(fenString);
+    }
+
     for (auto s : v) {
         if (expectMove) {
             if (s.size() != 4)
