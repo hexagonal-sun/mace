@@ -35,9 +35,11 @@ const SquareState & Board::getSquare(std::string name) const
     return board_.at(Locus(rank, file));
 }
 
-Move Board::validateMove(std::string from, std::string to)
+Move Board::validateMove(std::string from, std::string to,
+                         const MoveType promotion)
 {
-    return validateMove(Locus(from[1], from[0]), Locus(to[1], to[0]));
+    return validateMove(Locus(from[1], from[0]), Locus(to[1], to[0]),
+                        promotion);
 }
 
 const Colour Board::getNextMoveColour(void) const
@@ -50,13 +52,19 @@ Colour & Board::getNextMoveColour(void)
     return nextMoveColour_;
 }
 
-Move Board::validateMove(const Locus & from, const Locus &to)
+Move Board::validateMove(const Locus & from, const Locus &to,
+                         const MoveType promotion)
 {
     const auto &allowedMoves = MoveGen::getLegalMoves(*this);
 
     for (const auto &m : allowedMoves) {
-        if (m.getFrom() == from && m.getTo() == to)
-            return m;
+        if (m.getFrom() == from && m.getTo() == to) {
+            if (!isPromotion(promotion))
+                return m;
+
+            if (m.getType() == promotion)
+                return m;
+        }
     }
 
     return Move();

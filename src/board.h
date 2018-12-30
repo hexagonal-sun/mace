@@ -20,8 +20,10 @@ class Board
 public:
     static Board getStartingBoard(void);
     static Board constructFromFEN(std::string fen);
-    Move validateMove(std::string from, std::string to);
-    Move validateMove(const Locus &from, const Locus &to);
+    Move validateMove(std::string from, std::string to,
+                      const MoveType promotion);
+    Move validateMove(const Locus &from, const Locus &to,
+                      const MoveType promotion);
     const Colour getNextMoveColour(void) const;
     Colour &getNextMoveColour(void);
     const bool isInCheck(Colour kingsColour) const;

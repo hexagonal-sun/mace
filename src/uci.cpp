@@ -44,14 +44,39 @@ void UCI::handleCommandPosition(std::string line)
 
     for (auto s : v) {
         if (expectMove) {
-            if (s.size() != 4)
+            MoveType promotion = MoveType::UNOCCUPIED;
+
+            if (s.size() != 4 &&
+                s.size() != 5)
                 throw std::invalid_argument("Unknown move specification: '" +
                                             s + "'");
 
             auto from = s.substr(0, 2);
             auto to = s.substr(2);
 
-            auto move = b_.validateMove(from, to);
+            if (s.size() == 5) {
+                auto promotionChar = s[4];
+
+                switch (promotionChar)
+                {
+                case 'q':
+                    promotion = MoveType::PROMOTE_QUEEN;
+                    break;
+                case 'r':
+                    promotion = MoveType::PROMOTE_ROOK;
+                    break;
+                case 'n':
+                    promotion = MoveType::PROMOTE_KNIGHT;
+                    break;
+                case 'b':
+                    promotion = MoveType::PROMOTE_BISHOP;
+                    break;
+                default:
+                    throw std::invalid_argument("Unknown promotion piece");
+                }
+            }
+
+            auto move = b_.validateMove(from, to, promotion);
 
             if (!move.isValid())
                 throw std::invalid_argument("Illegal move: '" + s + "'");
