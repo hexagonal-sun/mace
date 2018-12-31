@@ -33,6 +33,7 @@ AC_CHECK_TYPES([ptrdiff_t])
 AX_CXX_COMPILE_STDCXX_17(, [mandatory])
 
 AX_APPEND_COMPILE_FLAGS([-flto -Wall -pedantic -g3 -O3], [CXXFLAGS])
+AX_APPEND_LINK_FLAGS([-flto -O3])
 
 # Checks for library functions.
 AX_PTHREAD([])
