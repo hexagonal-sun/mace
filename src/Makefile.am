@@ -13,3 +13,5 @@ bin_PROGRAMS = mace
 EXTRA_PROGRAMS = perft-splitter
 
 LDADD = libmace.a
+CXXFLAGS = $(PTHREAD_CFLAGS)
+LDFLAGS = $(PTHREAD_LDFLAGS)

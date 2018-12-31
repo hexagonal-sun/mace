@@ -1,4 +1,6 @@
+#include <thread>
 #include <limits>
+#include <atomic>
 
 #include "board.h"
 #include "mover.hpp"
@@ -22,12 +24,18 @@ static int getPlayersEvaluation(Board &node)
     return eval;
 }
 
+static std::atomic<bool> stopSearch(false);
+static Move bestMove;
+
 template<SearchType type>
 static int search(Board &node, size_t depth,
                      int alpha, int beta,
                      SearchResults &res)
 
 {
+    if (stopSearch)
+        return 0;
+
     res.vistedNode();
 
     if (type == SearchType::ALPHABETA && depth == 0)
@@ -99,11 +107,9 @@ static void doSearch(Board &b, SearchResults &results)
                                      alpha, beta, results);
 }
 
-Move searchMove(Board &b, const Clock::duration timeLimit,
-                std::function<void(SearchResults &results)> dumpResults)
+static void doDeepeningSearch(Board &b,
+                              std::function<void(SearchResults &results)> dumpResults)
 {
-    const auto searchStart = Clock::now();
-    const auto searchEnd = searchStart + timeLimit;
     const auto searchDirection = b.getNextMoveColour() == Colour::WHITE ?
         MinMax::MAX : MinMax::MIN;
     size_t depth = 1;
@@ -116,9 +122,25 @@ Move searchMove(Board &b, const Clock::duration timeLimit,
         results.finishedSearch();
         dumpResults(results);
 
-        if (Clock::now() > searchEnd)
-            return results.getBestMove();
+        if (stopSearch) {
+            bestMove = results.getBestMove();
+            return;
+        }
 
         depth++;
     }
+}
+
+Move searchMove(Board &b, const Clock::duration timeLimit,
+                std::function<void(SearchResults &results)> dumpResults)
+{
+    stopSearch = false;
+    std::thread searchThread(doDeepeningSearch, std::ref(b), dumpResults);
+
+    std::this_thread::sleep_for(timeLimit);
+
+    stopSearch = true;
+    searchThread.join();
+
+    return bestMove;
 }

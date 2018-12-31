@@ -35,6 +35,8 @@ AX_CXX_COMPILE_STDCXX_17(, [mandatory])
 AX_APPEND_COMPILE_FLAGS([-flto -Wall -pedantic], [CXXFLAGS])
 
 # Checks for library functions.
+AX_PTHREAD([])
+
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  testsuite/Makefile])
