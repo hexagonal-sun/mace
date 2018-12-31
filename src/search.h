@@ -2,6 +2,7 @@
 
 #include "board.h"
 #include "move.hpp"
+#include <limits>
 #include <chrono>
 #include <functional>
 
@@ -29,9 +30,9 @@ public:
           start_(Clock::now()), searchDir_(searchDir)
         {
             if (searchDir_ == MinMax::MIN)
-                score_ = INT_MAX;
+                score_ = std::numeric_limits<int>::max();
             else
-                score_ = -INT_MAX;
+                score_ = std::numeric_limits<int>::min();
         }
 
     void finishedSearch()

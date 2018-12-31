@@ -1,4 +1,4 @@
-#include <climits>
+#include <limits>
 
 #include "board.h"
 #include "mover.hpp"
@@ -50,12 +50,13 @@ static int search(Board &node, size_t depth,
             return getPlayersEvaluation(node);
 
         if (node.isInCheck(node.getNextMoveColour()))
-            return -INT_MAX + ((res.getDepth() - depth) + 1);
+            return std::numeric_limits<int>::min() +
+                ((res.getDepth() - depth) + 1);
         else
             return 0;
     }
 
-    int val = -INT_MAX;
+    int val = std::numeric_limits<int>::min();
 
     if (type == SearchType::QUIESCENT) {
         val = getPlayersEvaluation(node);
@@ -91,8 +92,8 @@ static int search(Board &node, size_t depth,
 
 static void doSearch(Board &b, SearchResults &results)
 {
-    int alpha = -INT_MAX;
-    int beta = INT_MAX;
+    int alpha = std::numeric_limits<int>::min();
+    int beta = std::numeric_limits<int>::max();
 
     search<SearchType::ALPHABETA>(b, results.getDepth(),
                                      alpha, beta, results);
