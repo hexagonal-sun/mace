@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "moveTypes/orthodiagonal.hpp"
 #include "moveTypes/orthogonal.hpp"
 #include "moveTypes/knight.hpp"
