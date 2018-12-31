@@ -13,4 +13,4 @@ typedef boost::container::small_vector<Move, 64> moveList_t;
 namespace MoveGen
 {
     moveList_t getLegalMoves(Board &);
-};
+}
