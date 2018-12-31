@@ -15,7 +15,8 @@ applyTranslationSpec(const Board &b, Locus &from,
                      SquareState fromSquare,
                      const std::array<T, N> &ms,
                      bool singularTransform,
-                     moveList_t &moves)
+                     moveList_t &takeMoves,
+                     moveList_t &quietMoves)
 {
     auto movingPieceColour = fromSquare.getColour();
 
@@ -39,7 +40,10 @@ applyTranslationSpec(const Board &b, Locus &from,
             auto moveType = square.isOccupied() ?
                 MoveType::TAKE : MoveType::UNOCCUPIED;
 
-            moves.push_back(Move(from, l, moveType));
+            moveList_t &moveList = moveType == MoveType::TAKE ?
+                takeMoves : quietMoves;
+
+            moveList.push_back(Move(from, l, moveType));
 
             if (singularTransform || moveType == MoveType::TAKE)
                 goto nextDir;
@@ -50,9 +54,11 @@ applyTranslationSpec(const Board &b, Locus &from,
 }
 
 static void
-genMovesBishop(const Board &b, Locus from, SquareState sq, moveList_t &moves)
+genMovesBishop(const Board &b, Locus from, SquareState sq, moveList_t &takeMoves,
+               moveList_t &quietMoves)
 {
-    applyTranslationSpec(b, from, sq, diagonalMoves, false, moves);
+    applyTranslationSpec(b, from, sq, diagonalMoves, false, takeMoves,
+                         quietMoves);
 }
 
 static void genCastlingMove(moveList_t &moves, Colour ourColour, const Board &b,
@@ -118,27 +124,30 @@ addCastlingMoves(moveList_t &moves, Colour ourColour, const Board &b,
 }
 
 static void
-genMovesKing(const Board &b, Locus from, SquareState sq, moveList_t &moves)
+genMovesKing(const Board &b, Locus from, SquareState sq, moveList_t &takeMoves,
+             moveList_t &quietMoves)
 {
     auto cr = b.getCastlingRights();
     const auto &colourMask = getCastlingMask(sq.getColour());
 
-    applyTranslationSpec(b, from, sq, orthoDiagonalMoves, true, moves);
+    applyTranslationSpec(b, from, sq, orthoDiagonalMoves, true, takeMoves,
+                         quietMoves);
 
     if (!(cr & colourMask).any())
         // No castling rights are open to us, just return king's
         // standard moves.
         return;
 
-    addCastlingMoves(moves, sq.getColour(), b, from,
+    addCastlingMoves(quietMoves, sq.getColour(), b, from,
                      (cr & colourMask & getKingSideMask()).any(),
                      (cr & colourMask & getQueenSideMask()).any());
 }
 
 static void
-genMovesKnight(const Board &b, Locus from, SquareState sq, moveList_t &moves)
+genMovesKnight(const Board &b, Locus from, SquareState sq, moveList_t &takeMoves,
+               moveList_t &quietMoves)
 {
-    applyTranslationSpec(b, from, sq, knightMoves, true, moves);
+    applyTranslationSpec(b, from, sq, knightMoves, true, takeMoves, quietMoves);
 }
 
 static void addPawnPromotions(moveList_t &moves, Locus from, Locus to)
@@ -151,7 +160,8 @@ static void addPawnPromotions(moveList_t &moves, Locus from, Locus to)
 }
 
 static void
-genMovesPawn(const Board &b, Locus from, SquareState sq, moveList_t &moves)
+genMovesPawn(const Board &b, Locus from, SquareState sq, moveList_t &takeMoves,
+             moveList_t &quietMoves)
 {
     const auto pawnColour = sq.getColour();
     const auto dir = pawnColour == Colour::WHITE ? Direction::NORTH() : Direction::SOUTH();
@@ -162,17 +172,17 @@ genMovesPawn(const Board &b, Locus from, SquareState sq, moveList_t &moves)
 
     if (!b[newLoc].isOccupied()) {
         if (newLoc.getRank() == promotionRank)
-            addPawnPromotions(moves, from, newLoc);
+            addPawnPromotions(takeMoves, from, newLoc);
         else
-            moves.push_back(Move(from, newLoc, MoveType::UNOCCUPIED));
+            quietMoves.push_back(Move(from, newLoc, MoveType::UNOCCUPIED));
 
         // We can only move a pawn forward two squares if it isn't
         // obstructed at `newLoc' and it's on it's starting rank.
         if (from.getRank() == startingRank) {
             auto doubleMove = newLoc + dir;
             if (!b[doubleMove].isOccupied())
-                moves.push_back(Move(from, doubleMove,
-                                   MoveType::ENPASSANT_ADVANCE));
+                quietMoves.push_back(Move(from, doubleMove,
+                                          MoveType::ENPASSANT_ADVANCE));
         }
     }
 
@@ -187,56 +197,61 @@ genMovesPawn(const Board &b, Locus from, SquareState sq, moveList_t &moves)
 
         if (from.getRank() == enPassantRank &&
             takeLoc == b.getEnPassantLocus())
-            moves.push_back(Move(from, takeLoc,
-                                 MoveType::ENPASSANT_TAKE));
+            takeMoves.push_back(Move(from, takeLoc,
+                                     MoveType::ENPASSANT_TAKE));
 
         if (b[takeLoc].isOccupied() &&
             b[takeLoc].getColour() == ~pawnColour) {
             if (takeLoc.getRank() == promotionRank)
-                addPawnPromotions(moves, from, takeLoc);
+                addPawnPromotions(takeMoves, from, takeLoc);
             else
-                moves.push_back(Move(from, takeLoc, MoveType::TAKE));
+                takeMoves.push_back(Move(from, takeLoc, MoveType::TAKE));
         }
     }
 }
 
 static void
-genMovesQueen(const Board &b, Locus from, SquareState sq, moveList_t &moves)
+genMovesQueen(const Board &b, Locus from, SquareState sq, moveList_t &takeMoves,
+              moveList_t &quietMoves)
 {
-    applyTranslationSpec(b, from, sq, orthoDiagonalMoves, false, moves);
+    applyTranslationSpec(b, from, sq, orthoDiagonalMoves, false, takeMoves,
+                         quietMoves);
 }
 
 static void
-genMovesRook(const Board &b, Locus from, SquareState sq, moveList_t &moves)
+genMovesRook(const Board &b, Locus from, SquareState sq, moveList_t &takeMoves,
+             moveList_t &quietMoves)
 {
-    applyTranslationSpec(b, from, sq, orthogonalMoves, false, moves);
+    applyTranslationSpec(b, from, sq, orthogonalMoves, false, takeMoves,
+                         quietMoves);
 }
 
 static void
-genMoves(const Board &b, Locus from, SquareState sq, moveList_t &moves)
+genMoves(const Board &b, Locus from, SquareState sq, moveList_t &takeMoves,
+         moveList_t &quietMoves)
 {
     auto pieceType = sq.getPieceType();
 
     switch (pieceType)
     {
     case PieceType::BISHOP:
-         genMovesBishop(b, from, sq, moves);
-         break;
+        genMovesBishop(b, from, sq, takeMoves, quietMoves);
+        break;
     case PieceType::KING:
-         genMovesKing(b, from, sq, moves);
-         break;
+        genMovesKing(b, from, sq, takeMoves, quietMoves);
+        break;
     case PieceType::KNIGHT:
-         genMovesKnight(b, from, sq, moves);
-         break;
+        genMovesKnight(b, from, sq, takeMoves, quietMoves);
+        break;
     case PieceType::PAWN:
-         genMovesPawn(b, from, sq, moves);
-         break;
+        genMovesPawn(b, from, sq, takeMoves, quietMoves);
+        break;
     case PieceType::QUEEN:
-         genMovesQueen(b, from, sq, moves);
-         break;
+        genMovesQueen(b, from, sq, takeMoves, quietMoves);
+        break;
     case PieceType::ROOK:
-         genMovesRook(b, from, sq, moves);
-         break;
+        genMovesRook(b, from, sq, takeMoves, quietMoves);
+        break;
     case PieceType::UNOCCUPIED:
         return;
     }
@@ -245,22 +260,27 @@ genMoves(const Board &b, Locus from, SquareState sq, moveList_t &moves)
 moveList_t
 MoveGen::getLegalMoves(Board &b)
 {
-    moveList_t ret;
+    moveList_t quietMoves;
+    moveList_t takeMoves;
     const auto colourToMove = b.getNextMoveColour();
 
     for (const auto [square, loc] : b.getChessBoard())
         if (square.isOccupied() &&
             square.getColour() == colourToMove)
-            genMoves(b, loc, square , ret);
+            genMoves(b, loc, square , takeMoves, quietMoves);
+
+    // Append the quiet moves onto the end of take moves to produce
+    // the full move list.
+    takeMoves.insert(takeMoves.end(), quietMoves.begin(), quietMoves.end());
 
     // Prune non-legal pseudo moves.
-    ret.erase(std::remove_if(ret.begin(),
-                             ret.end(),
-                             [&](const Move &move)
+    takeMoves.erase(std::remove_if(takeMoves.begin(),
+                                   takeMoves.end(),
+                                   [&](const Move &move)
     {
         Mover<MoverType::REVERT> m(move, b);
         return b.isInCheck(colourToMove);
-    }), ret.end());
+    }), takeMoves.end());
 
-    return ret;
+    return takeMoves;
 }
