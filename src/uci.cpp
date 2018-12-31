@@ -114,7 +114,7 @@ void UCI::handleCommandGo(std::string line)
     auto dumpResultsCallback = std::bind(&UCI::dumpResults, this,
                                          std::placeholders::_1);
 
-    auto move = searchMove(b_, std::chrono::milliseconds(10),
+    auto move = searchMove(b_, std::chrono::milliseconds(100),
                            dumpResultsCallback);
 
     os_ << "bestmove " <<  move << "\n";
