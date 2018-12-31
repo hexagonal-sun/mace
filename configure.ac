@@ -12,8 +12,8 @@ AM_SILENT_RULES([yes])
 
 
 # Checks for programs.
+: ${CXXFLAGS=""}
 AC_PROG_CXX
-AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MKDIR_P
 
@@ -32,7 +32,7 @@ AC_TYPE_UINT8_T
 AC_CHECK_TYPES([ptrdiff_t])
 AX_CXX_COMPILE_STDCXX_17(, [mandatory])
 
-AX_APPEND_COMPILE_FLAGS([-flto -Wall -pedantic], [CXXFLAGS])
+AX_APPEND_COMPILE_FLAGS([-flto -Wall -pedantic -g3 -O3], [CXXFLAGS])
 
 # Checks for library functions.
 AX_PTHREAD([])
