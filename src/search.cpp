@@ -8,6 +8,8 @@
 #include "moveStack.hpp"
 #include "search.h"
 
+constexpr int INF = std::numeric_limits<int>::max();
+
 static int getPlayersEvaluation(Board &node)
 {
     auto eval = getEvaluation(node);
@@ -45,7 +47,7 @@ static int qsearch(Board &node, size_t depth,
     if (moves.size() == 0)
         return getPlayersEvaluation(node);
 
-    int val = std::numeric_limits<int>::min();
+    int val = -INF;
 
     val = getPlayersEvaluation(node);
 
@@ -86,12 +88,12 @@ static int absearch(Board &node, size_t depth,
 
     if (moves.size() == 0) {
         if (node.isInCheck(node.getNextMoveColour()))
-            return std::numeric_limits<int>::min() + 1 + ply;
+            return (-INF) + 1 + ply;
         else
             return 0;
     }
 
-    int val = std::numeric_limits<int>::min();
+    int val = -INF;
 
     for (const auto move : moves) {
         Mover<MoverType::REVERT> m(move, node);
@@ -116,8 +118,8 @@ static int absearch(Board &node, size_t depth,
 
 static void doSearch(Board &b, SearchResults &results)
 {
-    int alpha = std::numeric_limits<int>::min();
-    int beta = std::numeric_limits<int>::max();
+    int alpha = -INF;
+    int beta = INF;
 
     absearch(b, results.getDepth(), alpha, beta, 0, results);
 }
