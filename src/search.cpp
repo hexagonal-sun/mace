@@ -29,8 +29,8 @@ static Move bestMove;
 
 template<SearchType type>
 static int search(Board &node, size_t depth,
-                     int alpha, int beta,
-                     SearchResults &res)
+                  int alpha, int beta, size_t ply,
+                  SearchResults &res)
 
 {
     if (stopSearch)
@@ -40,7 +40,7 @@ static int search(Board &node, size_t depth,
 
     if (type == SearchType::ALPHABETA && depth == 0)
         return search<SearchType::QUIESCENT>(node, depth,
-                                             alpha, beta, res);
+                                             alpha, beta, ply + 1, res);
 
     auto moves = MoveGen::getLegalMoves(node);
 
@@ -58,8 +58,7 @@ static int search(Board &node, size_t depth,
             return getPlayersEvaluation(node);
 
         if (node.isInCheck(node.getNextMoveColour()))
-            return std::numeric_limits<int>::min() +
-                ((res.getDepth() - depth) + 1);
+            return std::numeric_limits<int>::min() + 1 + ply;
         else
             return 0;
     }
@@ -79,7 +78,7 @@ static int search(Board &node, size_t depth,
         Mover<MoverType::REVERT> m(move, node);
 
         val = std::max(val, -search<type>(node, depth - 1,
-                                          -beta, -alpha, res));
+                                          -beta, -alpha, ply + 1, res));
 
         if (type == SearchType::ALPHABETA &&
             depth == res.getDepth() &&
@@ -104,7 +103,7 @@ static void doSearch(Board &b, SearchResults &results)
     int beta = std::numeric_limits<int>::max();
 
     search<SearchType::ALPHABETA>(b, results.getDepth(),
-                                     alpha, beta, results);
+                                  alpha, beta, 0, results);
 }
 
 static void doDeepeningSearch(Board &b,
