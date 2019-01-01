@@ -23,16 +23,19 @@ static int getPlayersEvaluation(Board &node)
 static std::atomic<bool> stopSearch(false);
 static Move bestMove;
 
-static int qsearch(Board &node, size_t depth,
-                   int alpha, int beta, size_t ply,
-                   SearchResults &res)
-
+static int qsearch(Board &node, int alpha, int beta)
 {
 
     if (stopSearch)
         return 0;
 
-    res.vistedNode();
+    int standPat =  getPlayersEvaluation(node);
+
+    if( standPat >= beta )
+        return beta;
+
+    if( alpha < standPat )
+        alpha = standPat;
 
     auto moves = MoveGen::getLegalMoves(node);
 
@@ -44,31 +47,19 @@ static int qsearch(Board &node, size_t depth,
                  move.getType() == MoveType::ENPASSANT_TAKE);
     }), moves.end());
 
-    if (moves.size() == 0)
-        return getPlayersEvaluation(node);
-
-    int val = -INF;
-
-    val = getPlayersEvaluation(node);
-
-    alpha = std::max(alpha, val);
-
-    if (alpha >= beta)
-        return val;
-
     for (const auto move : moves) {
         Mover<MoverType::REVERT> m(move, node);
 
-        val = std::max(val, -qsearch(node, depth - 1,
-                                     -beta, -alpha, ply + 1, res));
+        int score = -qsearch(node, -beta, -alpha);
 
-        alpha = std::max(alpha, val);
+        if (score >= beta)
+            return beta;
 
-        if (alpha >= beta)
-            break;
+        if (score > alpha)
+            alpha = score;
     }
 
-    return val;
+    return alpha;
 }
 
 static int absearch(Board &node, size_t depth,
@@ -82,7 +73,7 @@ static int absearch(Board &node, size_t depth,
     res.vistedNode();
 
     if (depth == 0)
-        return qsearch(node, depth, alpha, beta, ply + 1, res);
+        return qsearch(node, alpha, beta);
 
     auto moves = MoveGen::getLegalMoves(node);
 
