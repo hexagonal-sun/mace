@@ -8,12 +8,6 @@
 #include "moveStack.hpp"
 #include "search.h"
 
-enum class SearchType
-{
-    ALPHABETA,
-    QUIESCENT
-};
-
 static int getPlayersEvaluation(Board &node)
 {
     auto eval = getEvaluation(node);
@@ -27,10 +21,57 @@ static int getPlayersEvaluation(Board &node)
 static std::atomic<bool> stopSearch(false);
 static Move bestMove;
 
-template<SearchType type>
-static int search(Board &node, size_t depth,
-                  int alpha, int beta, size_t ply,
-                  SearchResults &res)
+static int qsearch(Board &node, size_t depth,
+                   int alpha, int beta, size_t ply,
+                   SearchResults &res)
+
+{
+
+    if (stopSearch)
+        return 0;
+
+    res.vistedNode();
+
+    auto moves = MoveGen::getLegalMoves(node);
+
+    moves.erase(std::remove_if(moves.begin(),
+                               moves.end(),
+                               [&](const Move &move)
+    {
+        return !(move.getType() == MoveType::TAKE ||
+                 move.getType() == MoveType::ENPASSANT_TAKE);
+    }), moves.end());
+
+    if (moves.size() == 0)
+        return getPlayersEvaluation(node);
+
+    int val = std::numeric_limits<int>::min();
+
+    val = getPlayersEvaluation(node);
+
+    alpha = std::max(alpha, val);
+
+    if (alpha >= beta)
+        return val;
+
+    for (const auto move : moves) {
+        Mover<MoverType::REVERT> m(move, node);
+
+        val = std::max(val, -qsearch(node, depth - 1,
+                                     -beta, -alpha, ply + 1, res));
+
+        alpha = std::max(alpha, val);
+
+        if (alpha >= beta)
+            break;
+    }
+
+    return val;
+}
+
+static int absearch(Board &node, size_t depth,
+                    int alpha, int beta, size_t ply,
+                    SearchResults &res)
 
 {
     if (stopSearch)
@@ -38,25 +79,12 @@ static int search(Board &node, size_t depth,
 
     res.vistedNode();
 
-    if (type == SearchType::ALPHABETA && depth == 0)
-        return search<SearchType::QUIESCENT>(node, depth,
-                                             alpha, beta, ply + 1, res);
+    if (depth == 0)
+        return qsearch(node, depth, alpha, beta, ply + 1, res);
 
     auto moves = MoveGen::getLegalMoves(node);
 
-    if (type == SearchType::QUIESCENT)
-        moves.erase(std::remove_if(moves.begin(),
-                                   moves.end(),
-                                   [&](const Move &move)
-    {
-        return !(move.getType() == MoveType::TAKE ||
-                 move.getType() == MoveType::ENPASSANT_TAKE);
-    }), moves.end());
-
     if (moves.size() == 0) {
-        if (type == SearchType::QUIESCENT)
-            return getPlayersEvaluation(node);
-
         if (node.isInCheck(node.getNextMoveColour()))
             return std::numeric_limits<int>::min() + 1 + ply;
         else
@@ -65,24 +93,13 @@ static int search(Board &node, size_t depth,
 
     int val = std::numeric_limits<int>::min();
 
-    if (type == SearchType::QUIESCENT) {
-        val = getPlayersEvaluation(node);
-
-        alpha = std::max(alpha, val);
-
-        if (alpha >= beta)
-            return val;
-    }
-
     for (const auto move : moves) {
         Mover<MoverType::REVERT> m(move, node);
 
-        val = std::max(val, -search<type>(node, depth - 1,
-                                          -beta, -alpha, ply + 1, res));
+        val = std::max(val, -absearch(node, depth - 1,
+                                      -beta, -alpha, ply + 1, res));
 
-        if (type == SearchType::ALPHABETA &&
-            depth == res.getDepth() &&
-            val > alpha)
+        if (depth == res.getDepth() && val > alpha)
         {
             res.setBestMove(move);
             res.setScore(val);
@@ -102,8 +119,7 @@ static void doSearch(Board &b, SearchResults &results)
     int alpha = std::numeric_limits<int>::min();
     int beta = std::numeric_limits<int>::max();
 
-    search<SearchType::ALPHABETA>(b, results.getDepth(),
-                                  alpha, beta, 0, results);
+    absearch(b, results.getDepth(), alpha, beta, 0, results);
 }
 
 static void doDeepeningSearch(Board &b,
