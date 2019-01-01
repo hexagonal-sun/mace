@@ -122,12 +122,8 @@ static void doDeepeningSearch(Board &b,
         results.finishedSearch();
         dumpResults(results);
 
-        if (stopSearch) {
-            if (results.getBestMove().isValid())
-                bestMove = results.getBestMove();
-
+        if (stopSearch)
             return;
-        }
 
         bestMove = results.getBestMove();
         depth++;
