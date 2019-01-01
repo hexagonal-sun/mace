@@ -257,6 +257,37 @@ genMoves(const Board &b, Locus from, SquareState sq, moveList_t &takeMoves,
     }
 }
 
+static const std::array<std::array<int, 6>, 6> MvvLvaScores =
+{{
+    //      P, K  Q, B, N  R,
+    /*P*/ { 0, 0,-9,-3,-2,-5},
+    /*K*/ { 0, 0, 0, 0, 0, 0},
+    /*Q*/ { 8, 0, 4, 6, 7, 5},
+    /*B*/ { 3, 0,-6, 1, 1,-2},
+    /*N*/ { 2, 0,-6, 0, 1,-2},
+    /*R*/ { 5, 0,-5, 3, 4, 2},
+}};
+
+static inline size_t pieceTypeIdx(PieceType pt)
+{
+    return (static_cast<int>(pt) >> 1) - 1;
+}
+
+static int calculateMVVLVA(const Move &m, const Board &b)
+{
+    auto takingPiece = b[m.getFrom()].getPieceType();
+    auto captiredPiece = b[m.getTo()].getPieceType();
+
+    if (isPromotion(m.getType()))
+        return 9;
+
+    if (m.getType() == MoveType::ENPASSANT_TAKE)
+        return 0;
+
+    return MvvLvaScores[pieceTypeIdx(captiredPiece)]
+                       [pieceTypeIdx(takingPiece)];
+}
+
 moveList_t
 MoveGen::getLegalMoves(Board &b)
 {
@@ -268,6 +299,13 @@ MoveGen::getLegalMoves(Board &b)
         if (square.isOccupied() &&
             square.getColour() == colourToMove)
             genMoves(b, loc, square , takeMoves, quietMoves);
+
+    // MVV-LVA sorting for taking moves.
+    std::sort(takeMoves.begin(), takeMoves.end(),
+              [&](const Move &ma, const Move &mb)
+    {
+        return calculateMVVLVA(ma, b) > calculateMVVLVA(mb, b);
+    });
 
     // Append the quiet moves onto the end of take moves to produce
     // the full move list.
