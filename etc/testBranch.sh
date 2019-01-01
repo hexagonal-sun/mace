@@ -35,4 +35,4 @@ cutechess-cli \
     -engine name=mace-master proto=uci cmd="$masterdir"/src/mace \
     -openings file="$masterdir"/etc/silversuite.pgn \
     -concurrency 3 -ratinginterval 10 -games 500 -pgnout games.pgn \
-    -each  tc=100+0.01
+    -each  tc=5+0.01

@@ -111,10 +111,28 @@ void UCI::dumpResults(SearchResults &results)
 
 void UCI::handleCommandGo(std::string line)
 {
+    std::vector<std::string> tokens;
+    boost::split(tokens, line, boost::is_any_of(" "));
+
+    const auto ourColour = b_.getNextMoveColour();
+    std::string timeSpec = ourColour == Colour::WHITE ?
+        "wtime" : "btime";
+
+    // Default time left if there is no specification of time.
+    auto ourTimeLeft = std::chrono::milliseconds(120000);
+
+    for (const auto &token : tokens)
+    {
+        if (token == timeSpec) {
+            ourTimeLeft = std::chrono::milliseconds(std::stoi(*(&token + 1)));
+            break;
+        }
+    }
+
     auto dumpResultsCallback = std::bind(&UCI::dumpResults, this,
                                          std::placeholders::_1);
 
-    auto move = searchMove(b_, std::chrono::milliseconds(100),
+    auto move = searchMove(b_, ourTimeLeft / 30,
                            dumpResultsCallback);
 
     os_ << "bestmove " <<  move << "\n";
