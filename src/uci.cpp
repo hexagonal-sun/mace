@@ -150,6 +150,8 @@ void UCI::mainLoop()
 
         if (line == "uci")
             handleCommandUCI();
+        else if (line == "d")
+            b_.printBoard(os_);
         else if (line == "isready")
             handleCommandIsReady();
         else if (line == "ucinewgame")
