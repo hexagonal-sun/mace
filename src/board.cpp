@@ -6,6 +6,7 @@
 #include <regex>
 
 #include "board.h"
+#include "zobrist.h"
 #include "mover.hpp"
 #include "moveGen.h"
 #include "moveTypes/orthogonal.hpp"
@@ -84,6 +85,7 @@ void Board::printBoard(std::ostream &stream) const
     }
 
     stream << "To move: " << colourNames.at(nextMoveColour_) << "\n";
+    stream << "Zobrist Hash: 0x" << std::hex << zobHash.getHash(*this) << "\n";
 }
 
 locusList_t Board::locatePiece(Colour c, PieceType t) const
