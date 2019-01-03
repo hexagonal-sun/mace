@@ -12,6 +12,14 @@ enum class PieceType
     ROOK       = (6 << 1)
 };
 
+inline size_t getPieceTypeIdx(PieceType p)
+{
+    if (p == PieceType::UNOCCUPIED)
+        throw std::invalid_argument("Can not get index of UNOCCUPIED piece type");
+
+    return (static_cast<int>(p) >> 1) - 1;
+}
+
 static const std::vector<PieceType> pieceTypes =
 {
     PieceType::PAWN,
