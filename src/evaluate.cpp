@@ -162,10 +162,7 @@ static int getValueFromTable(Locus l, SquareState s,
                              const psqt_t &table,
                              int phase)
 {
-    int idx = l.getIndex();
-
-    // Convert from 0x88 board coords to PSQT coords.
-    int tableIndex = (idx & 0xf) | ((idx & 0xf0) >> 1);
+    int tableIndex = l.getArrayIndex();
 
     if (s.getColour() == Colour::BLACK)
         tableIndex = (tableIndex & 7) |
