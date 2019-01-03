@@ -268,11 +268,6 @@ static const std::array<std::array<int, 6>, 6> MvvLvaScores =
     /*R*/ { 5, 0,-5, 3, 4, 2},
 }};
 
-static inline size_t pieceTypeIdx(PieceType pt)
-{
-    return (static_cast<int>(pt) >> 1) - 1;
-}
-
 static int calculateMVVLVA(const Move &m, const Board &b)
 {
     auto takingPiece = b[m.getFrom()].getPieceType();
@@ -284,8 +279,8 @@ static int calculateMVVLVA(const Move &m, const Board &b)
     if (m.getType() == MoveType::ENPASSANT_TAKE)
         return 0;
 
-    return MvvLvaScores[pieceTypeIdx(captiredPiece)]
-                       [pieceTypeIdx(takingPiece)];
+    return MvvLvaScores[getPieceTypeIdx(captiredPiece)]
+                       [getPieceTypeIdx(takingPiece)];
 }
 
 moveList_t
