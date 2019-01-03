@@ -71,6 +71,11 @@ size_t Locus::getIndex(void) const
     return idx_;
 }
 
+size_t Locus::getArrayIndex(void) const
+{
+    return (getIndex() & 0xf) | ((getIndex() & 0xf0) >> 1);
+}
+
 bool Locus::operator==(const Locus &other) const
 {
     return other.idx_ == idx_;

@@ -46,6 +46,7 @@ public:
     Locus(Rank r, File f);
     Locus(char rank, char file);
     size_t getIndex(void) const;
+    size_t getArrayIndex(void) const;
     Rank getRank(void) const;
     bool isValid(void) const;
     File getFile(void) const;
