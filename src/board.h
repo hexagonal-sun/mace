@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <functional>
 #include <ostream>
 #include <array>
 #include <vector>
@@ -42,7 +43,9 @@ public:
     const SquareState & operator[](const Locus &l) const;
     SquareState & operator[](const Locus &l);
     bool isSquareUnderAttack(Locus l, Colour c) const;
-    int perft(int depth, bool divide);
+    int perft(int depth, bool divide,
+              std::function<void(Move)> moveCallback = nullptr,
+              std::function<void(Move)> unmoveCallback = nullptr);
     std::map<PieceType, int> pieceCounts;
 private:
     Board(Colour nextMoveColour);

@@ -253,7 +253,9 @@ Locus &Board::getEnPassantLocus(void)
     return enPassantCapture_;
 }
 
-int Board::perft(int depth, bool divide)
+int Board::perft(int depth, bool divide,
+                 std::function<void(Move)> moveCallback,
+                 std::function<void(Move)> unmoveCallback)
 {
     if (!depth)
         return 1;
@@ -261,14 +263,21 @@ int Board::perft(int depth, bool divide)
     int nodes = 0;
 
     for (const auto &move : MoveGen::getLegalMoves(*this)) {
-        Mover<MoverType::REVERT> m(move, *this);
+        {
+            Mover<MoverType::REVERT> m(move, *this);
 
-        int moveNodes = perft(depth - 1, false);
+            if (moveCallback)
+                moveCallback(move);
 
-        if (divide)
-            std::cout << move << ": " << moveNodes << "\n";
+            int moveNodes = perft(depth - 1, false);
 
-        nodes += moveNodes;
+            if (divide)
+                std::cout << move << ": " << moveNodes << "\n";
+
+            nodes += moveNodes;
+        }
+        if (unmoveCallback)
+            unmoveCallback(move);
     }
 
     return nodes;
