@@ -6,10 +6,10 @@ ChessBoard::operator[](const Locus &l) const
     return b_[l.getIndex()];
 }
 
-SquareState &
+SquareStateModifier
 ChessBoard::operator[](const Locus &l)
 {
-    return b_[l.getIndex()];
+    return SquareStateModifier(l, b_[l.getIndex()], *this);
 }
 
 ZobristHash

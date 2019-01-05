@@ -16,8 +16,8 @@ public:
           enPassantCapture_(b.getEnPassantLocus()),
           castlingRights_(b.getCastlingRights())
         {
-            auto &sourceSquare = board_[move_.getFrom()];
-            auto &destSquare = board_[move_.getTo()];
+            auto sourceSquare = board_[move_.getFrom()];
+            auto destSquare = board_[move_.getTo()];
             auto movingPieceType = sourceSquare.getPieceType();
             auto movingPieceColour = sourceSquare.getColour();
 
@@ -137,8 +137,8 @@ public:
             if (t == MoverType::COMMIT)
                 return;
 
-            auto &sourceSquare = board_[move_.getTo()];
-            auto &destSquare = board_[move_.getFrom()];
+            auto sourceSquare = board_[move_.getTo()];
+            auto destSquare = board_[move_.getFrom()];
 
             destSquare = sourceSquare;
             sourceSquare = SquareState::UNOCCUPIED;

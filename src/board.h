@@ -41,7 +41,7 @@ public:
     void printBoard(std::ostream &stream) const;
     void printFEN(std::ostream &os) const;
     const SquareState & operator[](const Locus &l) const;
-    SquareState & operator[](const Locus &l);
+    SquareStateModifier operator[](const Locus &l);
     bool isSquareUnderAttack(Locus l, Colour c) const;
     int perft(int depth, bool divide,
               std::function<void(Move)> moveCallback = nullptr,

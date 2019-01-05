@@ -9,12 +9,13 @@
 #include "squareState.hpp"
 #include "zobrist.h"
 
+class SquareStateModifier;
 
 class ChessBoard
 {
 public:
     const SquareState &operator[](const Locus &l) const;
-    SquareState &operator[](const Locus &l);
+    SquareStateModifier operator[](const Locus &l);
     const SquareState &at(const Locus &l) const;
     ZobristHash getHash() const;
     ZobristHash &getHash();
@@ -153,4 +154,47 @@ public:
 private:
     std::array<SquareState, 128> b_;
     ZobristHash hash_;
+};
+
+class SquareStateModifier
+{
+    Locus l_;
+    SquareState &sq_;
+    ChessBoard &cb_;
+public:
+    SquareStateModifier(Locus l, SquareState &sq, ChessBoard &cb)
+        : l_(l), sq_(sq), cb_(cb) {};
+
+    SquareStateModifier &operator=(const SquareState &sq)
+        {
+            zobHash.updateHash(cb_.getHash(), l_, sq_, sq);
+
+            sq_ = sq;
+
+            return *this;
+        }
+
+    SquareStateModifier &operator=(const SquareStateModifier &other)
+        {
+            zobHash.updateHash(cb_.getHash(), l_, sq_, other.sq_);
+
+            sq_ = other.sq_;
+
+            return *this;
+        }
+
+    PieceType getPieceType() const
+        {
+            return sq_.getPieceType();
+        }
+
+    Colour getColour() const
+        {
+            return sq_.getColour();
+        }
+
+    operator SquareState() const
+        {
+            return sq_;
+        }
 };

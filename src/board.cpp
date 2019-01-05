@@ -180,12 +180,12 @@ const bool Board::isInCheck(Colour kingsColour) const
                                getOppositeColour(kingsColour));
 }
 
-const SquareState & Board::operator[](const Locus &l) const
+const SquareState &Board::operator[](const Locus &l) const
 {
     return board_.at(l);
 }
 
-SquareState & Board::operator[](const Locus &l)
+SquareStateModifier Board::operator[](const Locus &l)
 {
     return board_[l];
 }
