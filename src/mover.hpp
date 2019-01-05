@@ -131,11 +131,14 @@ public:
                 board_.pieceCounts[takenSquare.getPieceType()]--;
 
             board_.getNextMoveColour() = getOppositeColour(board_.getNextMoveColour());
+            board_.pushPosition();
         }
     ~Mover()
         {
             if (t == MoverType::COMMIT)
                 return;
+
+            board_.popPosition();
 
             auto sourceSquare = board_[move_.getTo()];
             auto destSquare = board_[move_.getFrom()];

@@ -23,6 +23,8 @@ Board::Board(Colour nextMoveColour)
                           PieceType::QUEEN,
                           PieceType::ROOK})
         pieceCounts[pt] = 0;
+
+    seenPositions_.rehash(256);
 }
 
 const SquareState & Board::getSquare(std::string name) const
@@ -454,6 +456,8 @@ Board Board::constructFromFEN(std::string fen)
 
         rank = static_cast<Rank>(static_cast<int>(rank) - 0x10);
     }
+
+    board.pushPosition();
 
     return board;
 }

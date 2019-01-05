@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <functional>
+#include <unordered_set>
 #include <ostream>
 #include <array>
 #include <vector>
@@ -50,10 +51,15 @@ public:
 
     const ZobristHash getHash() const { return board_.getHash(); }
     ZobristHash &getHash() { return board_.getHash(); }
+
+    void pushPosition() { seenPositions_.insert(getHash()); }
+    void popPosition() { seenPositions_.erase(getHash()); }
+
 private:
     Board(Colour nextMoveColour);
     CastlingRights castlingRights_;
     Locus enPassantCapture_;
+    std::unordered_set<ZobristHash, Zobrist::Hash> seenPositions_;
     std::array<Locus, 2> kingLocus_;
     locusList_t locatePiece(Colour c, PieceType t) const;
     Colour nextMoveColour_;
