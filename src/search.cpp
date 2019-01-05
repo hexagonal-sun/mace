@@ -50,7 +50,15 @@ static int qsearch(Board &node, int alpha, int beta)
     for (const auto move : moves) {
         Mover<MoverType::REVERT> m(move, node);
 
+        if (node.seenPosition())
+            // If we have already seen this position, it's repetition.
+            return 0;
+
+        node.pushPosition();
+
         int score = -qsearch(node, -beta, -alpha);
+
+        node.popPosition();
 
         if (score >= beta)
             return beta;
