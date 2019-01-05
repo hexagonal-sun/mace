@@ -52,6 +52,9 @@ public:
     const ZobristHash getHash() const { return board_.getHash(); }
     ZobristHash &getHash() { return board_.getHash(); }
 
+    const size_t getHalfMoveClock() const { return halfMoveClock_; }
+    size_t &getHalfMoveClock() { return halfMoveClock_; }
+
     void pushPosition() { seenPositions_.insert(getHash()); }
     void popPosition() { seenPositions_.erase(getHash()); }
     bool seenPosition() { return seenPositions_.count(getHash()); }
@@ -64,5 +67,6 @@ private:
     std::array<Locus, 2> kingLocus_;
     locusList_t locatePiece(Colour c, PieceType t) const;
     Colour nextMoveColour_;
+    size_t halfMoveClock_;
     ChessBoard board_;
 };

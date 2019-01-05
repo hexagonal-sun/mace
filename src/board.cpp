@@ -14,7 +14,8 @@
 #include "moveTypes/knight.hpp"
 
 Board::Board(Colour nextMoveColour)
-    : nextMoveColour_(nextMoveColour)
+    : nextMoveColour_(nextMoveColour),
+      halfMoveClock_(0)
 {
     for (const auto &pt : {PieceType::BISHOP,
                           PieceType::KING,
@@ -340,7 +341,9 @@ void Board::printFEN(std::ostream &os) const
     else
         os << "-";
 
-    os << " 0 1\n";
+    os << " " << getHalfMoveClock() << " ";
+
+    os << "1\n";
 }
 
 Board Board::constructFromFEN(std::string fen)
@@ -400,6 +403,9 @@ Board Board::constructFromFEN(std::string fen)
 
         board.getEnPassantLocus() = enPassantLocus;
     }
+
+    auto halfMoveClock = fields[4];
+    board.getHalfMoveClock() = std::stoi(halfMoveClock);
 
     std::vector<std::string> boardSpec;
     boost::split(boardSpec, fields[0], boost::is_any_of("/"));
