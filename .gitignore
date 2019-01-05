@@ -28,5 +28,7 @@ test-driver
 testsuite/.deps/
 testsuite/perft-tester
 testsuite/perft-tester.o
+testsuite/zobrist-tester
+testsuite/zobrist-tester.o
 testsuite/*.log
 testsuite/*.trs
