@@ -14,7 +14,8 @@ public:
     Mover(const Move &m, Board &b)
         : move_(m), board_(b),
           enPassantCapture_(b.getEnPassantLocus()),
-          castlingRights_(b.getCastlingRights())
+          castlingRights_(b.getCastlingRights()),
+          halfMoveClock_(b.getHalfMoveClock())
         {
             auto sourceSquare = board_[move_.getFrom()];
             auto destSquare = board_[move_.getTo()];
@@ -130,6 +131,12 @@ public:
             if (takenSquare.isOccupied())
                 board_.pieceCounts[takenSquare.getPieceType()]--;
 
+            if (movingPieceType == PieceType::PAWN ||
+                move_.getType() == MoveType::TAKE)
+                board_.getHalfMoveClock() = 0;
+            else
+                board_.getHalfMoveClock()++;
+
             board_.getNextMoveColour() = getOppositeColour(board_.getNextMoveColour());
 
             if (t == MoverType::COMMIT)
@@ -174,6 +181,7 @@ public:
 
             board_.getEnPassantLocus() = enPassantCapture_;
             board_.getCastlingRights() = castlingRights_;
+            board_.getHalfMoveClock() = halfMoveClock_;
         }
     Mover(const Mover &m) = delete;
     Mover(Mover &&m) = delete;
@@ -194,4 +202,5 @@ private:
     Locus enPassantTake_;
     Locus castlingRookSource_;
     Locus castlingRookDest_;
+    size_t halfMoveClock_;
 };
