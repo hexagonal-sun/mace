@@ -47,6 +47,9 @@ public:
               std::function<void(Move)> moveCallback = nullptr,
               std::function<void(Move)> unmoveCallback = nullptr);
     std::map<PieceType, int> pieceCounts;
+
+    const ZobristHash getHash() const { return board_.getHash(); }
+    ZobristHash &getHash() { return board_.getHash(); }
 private:
     Board(Colour nextMoveColour);
     CastlingRights castlingRights_;
