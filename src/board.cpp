@@ -91,7 +91,7 @@ void Board::printBoard(std::ostream &stream) const
     }
 
     stream << "To move: " << colourNames.at(nextMoveColour_) << "\n";
-    stream << "Zobrist Hash: 0x" << std::hex << getHash() << "\n";
+    stream << "Zobrist Hash: 0x" << std::hex << getHash() << std::dec << "\n";
 }
 
 locusList_t Board::locatePiece(Colour c, PieceType t) const
