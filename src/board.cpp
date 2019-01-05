@@ -76,6 +76,9 @@ Move Board::validateMove(const Locus & from, const Locus &to,
 
 void Board::printBoard(std::ostream &stream) const
 {
+    stream << "FEN: ";
+    printFEN(stream);
+
     for (const auto &rank : RANKS)
     {
         for (const auto &file : FILES) {
