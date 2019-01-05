@@ -54,6 +54,10 @@ static int qsearch(Board &node, int alpha, int beta)
             // If we have already seen this position, it's repetition.
             return 0;
 
+        // Check for the 50 move rule.
+        if (node.getHalfMoveClock() >= 100)
+            return 0;
+
         node.pushPosition();
 
         int score = -qsearch(node, -beta, -alpha);
