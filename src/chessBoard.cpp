@@ -12,6 +12,18 @@ ChessBoard::operator[](const Locus &l)
     return b_[l.getIndex()];
 }
 
+ZobristHash
+ChessBoard::getHash() const
+{
+    return hash_;
+}
+
+ZobristHash &
+ChessBoard::getHash()
+{
+    return hash_;
+}
+
 const SquareState &
 ChessBoard::at(const Locus &l) const
 {

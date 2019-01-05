@@ -7,6 +7,8 @@
 #include "locus.h"
 #include "pieceType.hpp"
 #include "squareState.hpp"
+#include "zobrist.h"
+
 
 class ChessBoard
 {
@@ -14,6 +16,11 @@ public:
     const SquareState &operator[](const Locus &l) const;
     SquareState &operator[](const Locus &l);
     const SquareState &at(const Locus &l) const;
+    ZobristHash getHash() const;
+    ZobristHash &getHash();
+
+    ChessBoard()
+        : hash_(0) {}
 
     template <typename T>
     class iterator
@@ -145,4 +152,5 @@ public:
 
 private:
     std::array<SquareState, 128> b_;
+    ZobristHash hash_;
 };
