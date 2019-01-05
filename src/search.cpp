@@ -23,7 +23,7 @@ static int getPlayersEvaluation(Board &node)
 static std::atomic<bool> stopSearch(false);
 static Move bestMove;
 
-static int qsearch(Board &node, int alpha, int beta)
+static int qsearch(Board &node, int alpha, int beta, int depth)
 {
 
     if (stopSearch)
@@ -36,6 +36,9 @@ static int qsearch(Board &node, int alpha, int beta)
 
     if( alpha < standPat )
         alpha = standPat;
+
+    if (!depth)
+        return alpha;
 
     auto moves = MoveGen::getLegalMoves(node);
 
@@ -60,7 +63,7 @@ static int qsearch(Board &node, int alpha, int beta)
 
         node.pushPosition();
 
-        int score = -qsearch(node, -beta, -alpha);
+        int score = -qsearch(node, -beta, -alpha, depth -1);
 
         node.popPosition();
 
@@ -85,7 +88,7 @@ static int absearch(Board &node, size_t depth,
     res.vistedNode();
 
     if (depth == 0)
-        return qsearch(node, alpha, beta);
+        return qsearch(node, alpha, beta, res.getDepth() * 2);
 
     auto moves = MoveGen::getLegalMoves(node);
 
