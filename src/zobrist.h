@@ -19,6 +19,13 @@ public:
                     Locus loc,
                     SquareState before,
                     SquareState after) const;
+    struct Hash
+    {
+        std::size_t operator()(ZobristHash const& h) const noexcept
+            {
+                return h;
+            }
+    };
 };
 
 extern Zobrist zobHash;
