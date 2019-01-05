@@ -1,4 +1,5 @@
 #include <random>
+#include "board.h"
 #include "zobrist.h"
 
 Zobrist::Zobrist()
@@ -12,27 +13,41 @@ Zobrist::Zobrist()
             y = gen();
 }
 
-uint64_t Zobrist::getHash(const Board &b) const
+size_t Zobrist::getZobPieceTypeIdx(SquareState sq) const
 {
-    uint64_t hash = 0;
-    size_t sqIdx = 0;
+    size_t pieceIdx = getPieceTypeIdx(sq.getPieceType());
+
+    if (sq.getColour() == Colour::BLACK)
+        pieceIdx += 6;
+
+    return pieceIdx;
+}
+
+ZobristHash Zobrist::getHash(const Board &b) const
+{
+    ZobristHash hash = 0;
 
     for (const auto [sq, loc] : b.getChessBoard())
     {
         if (!sq.isOccupied())
             continue;
 
-        auto pieceIdx = (static_cast<int>(sq.getPieceType()) >> 1) - 1;
-
-        if (b.getNextMoveColour() == Colour::BLACK)
-            pieceIdx += 6;
-
-        hash ^= hashTable_[sqIdx][pieceIdx];
-
-        sqIdx++;
+        hash ^= hashTable_[loc.getArrayIndex()][getZobPieceTypeIdx(sq)];
     }
 
     return hash;
+}
+
+void Zobrist::updateHash(ZobristHash &hash,
+                         Locus loc,
+                         SquareState before,
+                         SquareState after) const
+{
+    if (before.isOccupied())
+        hash ^= hashTable_[loc.getArrayIndex()][getZobPieceTypeIdx(before)];
+
+    if (after.isOccupied())
+        hash ^= hashTable_[loc.getArrayIndex()][getZobPieceTypeIdx(after)];
 }
 
 Zobrist zobHash;

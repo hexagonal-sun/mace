@@ -2,14 +2,23 @@
 
 #include <array>
 
-#include "board.h"
+#include "squareState.hpp"
+
+class Board;
+
+using ZobristHash = uint64_t;
 
 class Zobrist
 {
     std::array<std::array<uint64_t, 12>, 64> hashTable_;
+    size_t getZobPieceTypeIdx(SquareState sq) const;
 public:
     Zobrist();
-    uint64_t getHash(const Board &b) const;
+    ZobristHash getHash(const Board &b) const;
+    void updateHash(ZobristHash &hash,
+                    Locus loc,
+                    SquareState before,
+                    SquareState after) const;
 };
 
 extern Zobrist zobHash;
