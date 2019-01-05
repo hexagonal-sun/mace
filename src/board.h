@@ -54,6 +54,7 @@ public:
 
     void pushPosition() { seenPositions_.insert(getHash()); }
     void popPosition() { seenPositions_.erase(getHash()); }
+    bool seenPosition() { return seenPositions_.count(getHash()); }
 
 private:
     Board(Colour nextMoveColour);
