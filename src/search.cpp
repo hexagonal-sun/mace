@@ -131,7 +131,7 @@ static int absearch(Board &node, size_t depth,
     }
 
     int val = -INF;
-    Move bestMove;
+    Move bMove;
 
     for (const auto move : moves) {
         Mover<MoverType::REVERT> m(move, node);
@@ -141,7 +141,7 @@ static int absearch(Board &node, size_t depth,
 
         if (val > alpha)
         {
-            bestMove = move;
+            bMove = move;
 
             if(depth == res.getDepth())
             {
@@ -162,7 +162,7 @@ static int absearch(Board &node, size_t depth,
         tableData.hash = hash;
         tableData.depth = depth;
         tableData.value = val;
-        tableData.bestMove = bestMove;
+        tableData.bestMove = bMove;
 
         if (val <= originalAlpha)
             tableData.nt = NodeType::UPPERBOUND;
