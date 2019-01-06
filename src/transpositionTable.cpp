@@ -1,3 +1,3 @@
 #include "transpositionTable.h"
 
-TranspositionTable TTable(17);
+TranspositionTable TTable(1024 * 128);

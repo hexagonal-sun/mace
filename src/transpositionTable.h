@@ -19,26 +19,22 @@ struct TTData
 
 class TranspositionTable
 {
-    std::vector<TTData> data_;
-    uint64_t mask;
+    size_t size_;
+    TTData *data_;
 public:
-    TranspositionTable(size_t bits)
-        : data_(1 << bits)
-    {
-        mask = (1 << bits) - 1;
-    }
+    TranspositionTable(size_t sz)
+        : size_(sz), data_(new TTData[sz]())
+        {
+        }
+
+    ~TranspositionTable()
+        {
+            delete data_;
+        }
 
     TTData &operator[](const ZobristHash hash)
         {
-            return data_[hash & mask];
-        }
-    const TTData &operator[](const ZobristHash hash) const
-        {
-            return data_[hash & mask];
-        }
-    const TTData at(ZobristHash hash) const
-        {
-            return data_.at(hash & mask);
+            return data_[hash % size_];
         }
 };
 
