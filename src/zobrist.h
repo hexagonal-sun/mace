@@ -2,6 +2,7 @@
 
 #include <array>
 
+#include "locus.h"
 #include "squareState.hpp"
 
 class Board;

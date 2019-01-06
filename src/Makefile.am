@@ -8,7 +8,7 @@ move.hpp castlingRights.hpp colour.hpp direction.hpp uci.h uci.cpp	\
 mcts.h mcts.cpp squareState.hpp squareState.cpp moveStack.hpp		\
 evaluate.cpp evaluate.h moveTypes/diagonal.hpp moveTypes/knight.hpp	\
 moveTypes/orthogonal.hpp moveTypes/orthodiagonal.hpp pieceType.hpp	\
-zobrist.h zobrist.cpp
+zobrist.h zobrist.cpp transpositionTable.cpp transpositionTable.h
 
 bin_PROGRAMS = mace
 EXTRA_PROGRAMS = perft-splitter
