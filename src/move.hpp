@@ -50,6 +50,14 @@ public:
     const MoveType getType() const { return type_; };
     const bool isValid() const { return isValid_; };
 
+    bool operator==(const Move &other)
+        {
+            return (isValid_ == other.isValid_ &&
+                    from_    == other.from_    &&
+                    to_      == other.to_      &&
+                    type_    == other.type_);
+        }
+
 private:
     Locus from_;
     Locus to_;
