@@ -4,8 +4,8 @@
 enum class NodeType
 {
     EXACT,
-    BETA,
-    ALPHA
+    LOWERBOUND,
+    UPPERBOUND
 };
 
 struct TTData
@@ -13,7 +13,7 @@ struct TTData
     ZobristHash hash;
     int value;
     size_t depth;
-    Move move;
+    Move bestMove;
     NodeType nt;
 };
 
