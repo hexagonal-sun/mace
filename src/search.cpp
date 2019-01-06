@@ -7,6 +7,7 @@
 #include "evaluate.h"
 #include "moveStack.hpp"
 #include "search.h"
+#include "transpositionTable.h"
 
 constexpr int INF = std::numeric_limits<int>::max();
 
@@ -82,10 +83,48 @@ static int absearch(Board &node, size_t depth,
                     SearchResults &res)
 
 {
+    int originalAlpha = alpha;
+
     if (stopSearch)
         return 0;
 
     res.vistedNode();
+
+    ZobristHash hash = node.getHash();
+
+    TTData &tableData = TTable[hash];
+
+    if (tableData.hash == node.getHash() &&
+        tableData.depth >= depth)
+    {
+        switch (tableData.nt)
+        {
+        case NodeType::UPPERBOUND:
+            beta = std::min(beta, tableData.value);
+            break;
+        case NodeType::LOWERBOUND:
+            alpha = std::max(alpha, tableData.value);
+            break;
+        case NodeType::EXACT:
+            if (res.getDepth() == depth)
+            {
+                res.setBestMove(tableData.bestMove);
+                res.setScore(tableData.value);
+            }
+            return tableData.value;
+        }
+
+        if (alpha >= beta)
+        {
+            if (res.getDepth() == depth)
+            {
+                res.setBestMove(tableData.bestMove);
+                res.setScore(tableData.value);
+            }
+
+            return tableData.value;
+        }
+    }
 
     if (depth == 0)
         return qsearch(node, alpha, beta, res.getDepth() * 2);
@@ -100,6 +139,7 @@ static int absearch(Board &node, size_t depth,
     }
 
     int val = -INF;
+    Move bMove;
 
     for (const auto move : moves) {
         Mover<MoverType::REVERT> m(move, node);
@@ -107,16 +147,37 @@ static int absearch(Board &node, size_t depth,
         val = std::max(val, -absearch(node, depth - 1,
                                       -beta, -alpha, ply + 1, res));
 
-        if (depth == res.getDepth() && val > alpha)
+        if (val > alpha)
         {
-            res.setBestMove(move);
-            res.setScore(val);
+            bMove = move;
+
+            if(depth == res.getDepth())
+            {
+                res.setBestMove(move);
+                res.setScore(val);
+            }
         }
 
         alpha = std::max(alpha, val);
 
         if (alpha >= beta)
             break;
+    }
+
+    // Only update the TT if we're not bailing out of a search due to
+    // lack of time.
+    if (!stopSearch) {
+        tableData.hash = hash;
+        tableData.depth = depth;
+        tableData.value = val;
+        tableData.bestMove = bMove;
+
+        if (val <= originalAlpha)
+            tableData.nt = NodeType::UPPERBOUND;
+        else if (val >= beta)
+            tableData.nt = NodeType::LOWERBOUND;
+        else
+            tableData.nt = NodeType::EXACT;
     }
 
     return val;
