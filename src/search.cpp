@@ -7,6 +7,7 @@
 #include "evaluate.h"
 #include "moveStack.hpp"
 #include "search.h"
+#include "transpositionTable.h"
 
 constexpr int INF = std::numeric_limits<int>::max();
 
@@ -82,6 +83,8 @@ static int absearch(Board &node, size_t depth,
                     SearchResults &res)
 
 {
+    NodeType nt = NodeType::ALPHA;
+
     if (stopSearch)
         return 0;
 
@@ -89,6 +92,27 @@ static int absearch(Board &node, size_t depth,
 
     if (depth == 0)
         return qsearch(node, alpha, beta, res.getDepth() * 2);
+
+    ZobristHash hash = node.getHash();
+
+    TTData &tableData = TTable[hash];
+
+    if (tableData.hash == node.getHash() &&
+        tableData.depth >= depth)
+        switch (tableData.nt)
+        {
+        case NodeType::BETA:
+            return beta;
+        case NodeType::ALPHA:
+            return alpha;
+        case NodeType::EXACT:
+            if (depth == res.getDepth())
+            {
+                res.setBestMove(tableData.move);
+                res.setScore(tableData.value);
+            }
+            return tableData.value;
+        }
 
     auto moves = MoveGen::getLegalMoves(node);
 
@@ -100,6 +124,7 @@ static int absearch(Board &node, size_t depth,
     }
 
     int val = -INF;
+    Move bestMove;
 
     for (const auto move : moves) {
         Mover<MoverType::REVERT> m(move, node);
@@ -107,19 +132,38 @@ static int absearch(Board &node, size_t depth,
         val = std::max(val, -absearch(node, depth - 1,
                                       -beta, -alpha, ply + 1, res));
 
-        if (depth == res.getDepth() && val > alpha)
+        if (val > alpha)
         {
-            res.setBestMove(move);
-            res.setScore(val);
+            alpha = val;
+            nt = NodeType::EXACT;
+            bestMove = move;
+
+            if (depth == res.getDepth())
+            {
+                res.setBestMove(move);
+                res.setScore(val);
+            }
         }
 
-        alpha = std::max(alpha, val);
-
         if (alpha >= beta)
+        {
+            nt = NodeType::BETA;
+            alpha = beta;
             break;
+        }
     }
 
-    return val;
+    // Only update the TT if we're not bailing out of a search due to
+    // lack of time.
+    if (!stopSearch) {
+        tableData.hash = hash;
+        tableData.depth = depth;
+        tableData.nt = nt;
+        tableData.value = alpha;
+        tableData.move = bestMove;
+    }
+
+    return alpha;
 }
 
 static void doSearch(Board &b, SearchResults &results)
