@@ -83,15 +83,12 @@ static int absearch(Board &node, size_t depth,
                     SearchResults &res)
 
 {
-    NodeType nt = NodeType::ALPHA;
+    int originalAlpha = alpha;
 
     if (stopSearch)
         return 0;
 
     res.vistedNode();
-
-    if (depth == 0)
-        return qsearch(node, alpha, beta, res.getDepth() * 2);
 
     ZobristHash hash = node.getHash();
 
@@ -99,20 +96,30 @@ static int absearch(Board &node, size_t depth,
 
     if (tableData.hash == node.getHash() &&
         tableData.depth >= depth)
+    {
         switch (tableData.nt)
         {
-        case NodeType::BETA:
-            return beta;
-        case NodeType::ALPHA:
-            return alpha;
+        case NodeType::UPPERBOUND:
+            beta = std::min(beta, tableData.value);
+            break;
+        case NodeType::LOWERBOUND:
+            alpha = std::max(alpha, tableData.value);
+            break;
         case NodeType::EXACT:
-            if (depth == res.getDepth())
+            if (res.getDepth() == depth)
             {
-                res.setBestMove(tableData.move);
+                res.setBestMove(tableData.bestMove);
                 res.setScore(tableData.value);
             }
             return tableData.value;
         }
+
+        if (alpha >= beta)
+            return tableData.value;
+    }
+
+    if (depth == 0)
+        return qsearch(node, alpha, beta, res.getDepth() * 2);
 
     auto moves = MoveGen::getLegalMoves(node);
 
@@ -134,23 +141,19 @@ static int absearch(Board &node, size_t depth,
 
         if (val > alpha)
         {
-            alpha = val;
-            nt = NodeType::EXACT;
             bestMove = move;
 
-            if (depth == res.getDepth())
+            if(depth == res.getDepth())
             {
                 res.setBestMove(move);
                 res.setScore(val);
             }
         }
 
+        alpha = std::max(alpha, val);
+
         if (alpha >= beta)
-        {
-            nt = NodeType::BETA;
-            alpha = beta;
             break;
-        }
     }
 
     // Only update the TT if we're not bailing out of a search due to
@@ -158,12 +161,18 @@ static int absearch(Board &node, size_t depth,
     if (!stopSearch) {
         tableData.hash = hash;
         tableData.depth = depth;
-        tableData.nt = nt;
-        tableData.value = alpha;
-        tableData.move = bestMove;
+        tableData.value = val;
+        tableData.bestMove = bestMove;
+
+        if (val <= originalAlpha)
+            tableData.nt = NodeType::UPPERBOUND;
+        else if (val >= beta)
+            tableData.nt = NodeType::LOWERBOUND;
+        else
+            tableData.nt = NodeType::EXACT;
     }
 
-    return alpha;
+    return val;
 }
 
 static void doSearch(Board &b, SearchResults &results)
