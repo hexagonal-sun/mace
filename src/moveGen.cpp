@@ -284,7 +284,7 @@ static int calculateMVVLVA(const Move &m, const Board &b)
 }
 
 moveList_t
-MoveGen::getLegalMoves(Board &b)
+MoveGen::getLegalMoves(Board &b, Move hashMove)
 {
     moveList_t quietMoves;
     moveList_t takeMoves;
@@ -314,6 +314,17 @@ MoveGen::getLegalMoves(Board &b)
         Mover<MoverType::REVERT> m(move, b);
         return b.isInCheck(colourToMove);
     }), takeMoves.end());
+
+    if (hashMove.isValid())
+    {
+        // Attempt to find the hashmove in the move list.
+        auto hm = std::find(takeMoves.begin(), takeMoves.end(),
+                            hashMove);
+
+        // If we find it, make it the first element to be searched.
+        if (hm != takeMoves.end())
+            std::iter_swap(hm, takeMoves.begin());
+    }
 
     return takeMoves;
 }

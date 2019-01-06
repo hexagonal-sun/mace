@@ -93,43 +93,48 @@ static int absearch(Board &node, size_t depth,
     ZobristHash hash = node.getHash();
 
     TTData &tableData = TTable[hash];
+    Move hashMove;
 
-    if (tableData.hash == node.getHash() &&
-        tableData.depth >= depth)
+    if (tableData.hash == node.getHash())
     {
-        switch (tableData.nt)
-        {
-        case NodeType::UPPERBOUND:
-            beta = std::min(beta, tableData.value);
-            break;
-        case NodeType::LOWERBOUND:
-            alpha = std::max(alpha, tableData.value);
-            break;
-        case NodeType::EXACT:
-            if (res.getDepth() == depth)
-            {
-                res.setBestMove(tableData.bestMove);
-                res.setScore(tableData.value);
-            }
-            return tableData.value;
-        }
+        hashMove = tableData.bestMove;
 
-        if (alpha >= beta)
+        if (tableData.depth >= depth)
         {
-            if (res.getDepth() == depth)
+            switch (tableData.nt)
             {
-                res.setBestMove(tableData.bestMove);
-                res.setScore(tableData.value);
+            case NodeType::UPPERBOUND:
+                beta = std::min(beta, tableData.value);
+                break;
+            case NodeType::LOWERBOUND:
+                alpha = std::max(alpha, tableData.value);
+                break;
+            case NodeType::EXACT:
+                if (res.getDepth() == depth)
+                {
+                    res.setBestMove(tableData.bestMove);
+                    res.setScore(tableData.value);
+                }
+                return tableData.value;
             }
 
-            return tableData.value;
+            if (alpha >= beta)
+            {
+                if (res.getDepth() == depth)
+                {
+                    res.setBestMove(tableData.bestMove);
+                    res.setScore(tableData.value);
+                }
+
+                return tableData.value;
+            }
         }
     }
 
     if (depth == 0)
         return qsearch(node, alpha, beta, res.getDepth() * 2);
 
-    auto moves = MoveGen::getLegalMoves(node);
+    auto moves = MoveGen::getLegalMoves(node, hashMove);
 
     if (moves.size() == 0) {
         if (node.isInCheck(node.getNextMoveColour()))
