@@ -49,8 +49,10 @@ public:
               std::function<void(Move)> unmoveCallback = nullptr);
     std::map<PieceType, int> pieceCounts;
 
-    const ZobristHash getHash() const { return board_.getHash(); }
-    ZobristHash &getHash() { return board_.getHash(); }
+    const ZobristHash getHash() const
+        {
+            return zobHash.applyBoardState(board_.getHash(), *this);
+        }
 
     const size_t getHalfMoveClock() const { return halfMoveClock_; }
     size_t &getHalfMoveClock() { return halfMoveClock_; }

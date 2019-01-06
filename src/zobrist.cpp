@@ -11,6 +11,15 @@ Zobrist::Zobrist()
     for (auto &x : hashTable_)
         for (auto &y : x)
             y = gen();
+
+    for (auto &cHash : colourHash_)
+        cHash = gen();
+
+    for (auto &cHash : castlingHash_)
+        cHash = gen();
+
+    for (auto &eHash : epHash_)
+        eHash = gen();
 }
 
 size_t Zobrist::getZobPieceTypeIdx(SquareState sq) const
@@ -35,7 +44,7 @@ ZobristHash Zobrist::getHash(const Board &b) const
         hash ^= hashTable_[loc.getArrayIndex()][getZobPieceTypeIdx(sq)];
     }
 
-    return hash;
+    return applyBoardState(hash, b);
 }
 
 void Zobrist::updateHash(ZobristHash &hash,
@@ -48,6 +57,21 @@ void Zobrist::updateHash(ZobristHash &hash,
 
     if (after.isOccupied())
         hash ^= hashTable_[loc.getArrayIndex()][getZobPieceTypeIdx(after)];
+}
+
+ZobristHash Zobrist::applyBoardState(ZobristHash hash,
+                                     const Board &b) const
+{
+    size_t colourIdx = static_cast<size_t>(b.getNextMoveColour());
+    Locus epl = b.getEnPassantLocus();
+
+    hash ^= colourHash_[colourIdx];
+    hash ^= castlingHash_[b.getCastlingRights().to_ullong()];
+
+    if (epl.isValid())
+        hash ^= epHash_[static_cast<size_t>(epl.getFile())];
+
+    return hash;
 }
 
 Zobrist zobHash;
