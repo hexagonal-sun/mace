@@ -323,7 +323,11 @@ MoveGen::getLegalMoves(Board &b, Move hashMove)
 
         // If we find it, make it the first element to be searched.
         if (hm != takeMoves.end())
-            std::iter_swap(hm, takeMoves.begin());
+        {
+            takeMoves.erase(hm);
+
+            takeMoves.insert(takeMoves.begin(), hashMove);
+        }
     }
 
     return takeMoves;
