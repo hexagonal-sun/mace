@@ -110,24 +110,11 @@ static int absearch(Board &node, size_t depth,
                 alpha = std::max(alpha, tableData.value);
                 break;
             case NodeType::EXACT:
-                if (res.getDepth() == depth)
-                {
-                    res.setBestMove(tableData.bestMove);
-                    res.setScore(tableData.value);
-                }
                 return tableData.value;
             }
 
             if (alpha >= beta)
-            {
-                if (res.getDepth() == depth)
-                {
-                    res.setBestMove(tableData.bestMove);
-                    res.setScore(tableData.value);
-                }
-
                 return tableData.value;
-            }
         }
     }
 
@@ -155,12 +142,6 @@ static int absearch(Board &node, size_t depth,
         if (val > alpha)
         {
             bMove = move;
-
-            if(depth == res.getDepth())
-            {
-                res.setBestMove(move);
-                res.setScore(val);
-            }
         }
 
         alpha = std::max(alpha, val);
@@ -171,18 +152,27 @@ static int absearch(Board &node, size_t depth,
 
     // Only update the TT if we're not bailing out of a search due to
     // lack of time.
-    if (!stopSearch) {
+    if (!stopSearch)
+    {
+        NodeType nt;
+        if (val <= originalAlpha)
+            nt = NodeType::UPPERBOUND;
+        else if (val >= beta)
+            nt = NodeType::LOWERBOUND;
+        else
+            nt = NodeType::EXACT;
+
+        // Don't replace exact nodes with cutoff nodes.  If we do, we
+        // risk destroying the PV.
+        if (tableData.nt == NodeType::EXACT &&
+            nt != NodeType::EXACT)
+            return val;
+
         tableData.hash = hash;
         tableData.depth = depth;
         tableData.value = val;
         tableData.bestMove = bMove;
-
-        if (val <= originalAlpha)
-            tableData.nt = NodeType::UPPERBOUND;
-        else if (val >= beta)
-            tableData.nt = NodeType::LOWERBOUND;
-        else
-            tableData.nt = NodeType::EXACT;
+        tableData.nt = nt;
     }
 
     return val;
@@ -196,6 +186,42 @@ static void doSearch(Board &b, SearchResults &results)
     absearch(b, results.getDepth(), alpha, beta, 0, results);
 }
 
+static void findPV(Board &node, SearchResults &res, int depth)
+{
+    if (depth == 0)
+        return;
+
+    ZobristHash hash = node.getHash();
+
+    TTData &tableData = TTable[hash];
+
+    if (tableData.hash != node.getHash())
+        return;
+
+    if (!tableData.bestMove.isValid())
+        return;
+
+    res.getPV().push_back(tableData.bestMove);
+
+    Mover<MoverType::REVERT> mover(tableData.bestMove, node);
+    findPV(node, res, depth -1);
+}
+
+static void findScore(Board &node, SearchResults &res)
+{
+    ZobristHash hash = node.getHash();
+
+    TTData &tableData = TTable[hash];
+
+    if (tableData.hash != node.getHash())
+        return;
+
+    if (!tableData.bestMove.isValid())
+        return;
+
+    res.setScore(tableData.value);
+}
+
 static void doDeepeningSearch(Board &b,
                               std::function<void(SearchResults &results)> dumpResults)
 {
@@ -203,17 +229,21 @@ static void doDeepeningSearch(Board &b,
         MinMax::MAX : MinMax::MIN;
     size_t depth = 1;
 
+    Move lastBestMove;
+
     while (1)
     {
         SearchResults results(depth, searchDirection);
 
         doSearch(b, results);
         results.finishedSearch();
-        dumpResults(results);
 
         if (stopSearch)
             return;
 
+        findPV(b, results, depth);
+        findScore(b, results);
+        dumpResults(results);
         bestMove = results.getBestMove();
         depth++;
     }
