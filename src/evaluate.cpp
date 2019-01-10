@@ -245,7 +245,10 @@ int calcuatePhase(Board &b)
     int phase = totalPhase;
 
     for (const auto pieceType : pieceTypes) {
-        auto count = b.pieceCounts.at(pieceType);
+        int count = 0;
+
+        for (const auto colour : {Colour::WHITE, Colour::BLACK})
+            count += b.pieceCounts.at(pieceType + colour);
 
         phase -= phaseWeights.at(pieceType) * count;
     }

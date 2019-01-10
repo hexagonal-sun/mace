@@ -17,13 +17,9 @@ Board::Board(Colour nextMoveColour)
     : nextMoveColour_(nextMoveColour),
       halfMoveClock_(0)
 {
-    for (const auto &pt : {PieceType::BISHOP,
-                          PieceType::KING,
-                          PieceType::KNIGHT,
-                          PieceType::PAWN,
-                          PieceType::QUEEN,
-                          PieceType::ROOK})
-        pieceCounts[pt] = 0;
+    for (const auto col : {Colour::WHITE, Colour::BLACK})
+        for (const auto pt : pieceTypes)
+            pieceCounts[pt + col] = 0;
 
     seenPositions_.rehash(256);
 }
@@ -212,8 +208,10 @@ bool Board::isDraw() const
         return true;
 
     if (totalPieces == 3 &&
-        (pieceCounts.at(PieceType::BISHOP) == 1 ||
-         pieceCounts.at(PieceType::KNIGHT) == 1))
+        (pieceCounts.at(PieceType::BISHOP + Colour::WHITE) == 1 ||
+         pieceCounts.at(PieceType::BISHOP + Colour::BLACK) == 1 ||
+         pieceCounts.at(PieceType::KNIGHT + Colour::WHITE) == 1 ||
+         pieceCounts.at(PieceType::KNIGHT + Colour::BLACK) == 1))
         return true;
 
     return false;
@@ -433,24 +431,26 @@ Board Board::constructFromFEN(std::string fen)
                 continue;
             }
 
+            SquareState sq;
+
             switch (std::tolower(pieceSpec)) {
             case 'p':
-                board[Locus(rank, file)] = PieceType::PAWN + colour;
+                sq = PieceType::PAWN + colour;
                 break;
             case 'r':
-                board[Locus(rank, file)] = PieceType::ROOK + colour;
+                sq = PieceType::ROOK + colour;
                 break;
             case 'n':
-                board[Locus(rank, file)] = PieceType::KNIGHT + colour;
+                sq = PieceType::KNIGHT + colour;
                 break;
             case 'b':
-                board[Locus(rank, file)] = PieceType::BISHOP + colour;
+                sq = PieceType::BISHOP + colour;
                 break;
             case 'q':
-                board[Locus(rank, file)] = PieceType::QUEEN + colour;
+                sq = PieceType::QUEEN + colour;
                 break;
             case 'k':
-                board[Locus(rank, file)] = PieceType::KING + colour;
+                sq = PieceType::KING + colour;
                 board.getKingLocus(colour) = Locus(rank, file);
                 break;
             default:
@@ -458,7 +458,9 @@ Board Board::constructFromFEN(std::string fen)
                                             pieceSpecString);
             }
 
-            board.pieceCounts[board[rank + file].getPieceType()]++;
+            board[rank + file] = sq;
+
+            board.pieceCounts[sq]++;
 
             file = static_cast<File>(static_cast<int>(file) + 1);
         }

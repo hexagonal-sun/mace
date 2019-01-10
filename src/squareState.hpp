@@ -30,8 +30,20 @@ public:
             return static_cast<PieceType>(state_ & 0xe);
         }
 
+    bool operator==(const SquareState& other) const
+        {
+            return state_ == other.state_;
+        }
+
     static const SquareState UNOCCUPIED;
 
+    struct Hash
+    {
+        std::size_t operator()(SquareState const& h) const noexcept
+            {
+                return h.state_;
+            }
+    };
 private:
     uint8_t state_;
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <unordered_map>
 #include <functional>
 #include <unordered_set>
 #include <ostream>
@@ -47,7 +48,7 @@ public:
     int perft(int depth, bool divide,
               std::function<void(Move)> moveCallback = nullptr,
               std::function<void(Move)> unmoveCallback = nullptr);
-    std::map<PieceType, int> pieceCounts;
+    std::unordered_map<SquareState, int, SquareState::Hash> pieceCounts;
 
     const ZobristHash getHash() const
         {

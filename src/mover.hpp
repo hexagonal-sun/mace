@@ -124,12 +124,12 @@ public:
 
             if (promoSquare.isOccupied()) {
                 destSquare = promoSquare;
-                board_.pieceCounts[PieceType::PAWN]--;
-                board_.pieceCounts[promoSquare.getPieceType()]++;
+                board_.pieceCounts[PieceType::PAWN + movingPieceColour]--;
+                board_.pieceCounts[promoSquare]++;
             }
 
             if (takenSquare.isOccupied())
-                board_.pieceCounts[takenSquare.getPieceType()]--;
+                board_.pieceCounts[takenSquare]--;
 
             if (movingPieceType == PieceType::PAWN ||
                 move_.getType() == MoveType::TAKE)
@@ -154,9 +154,9 @@ public:
             sourceSquare = SquareState::UNOCCUPIED;
 
             if (isPromotion(move_.getType())) {
-                board_.pieceCounts[destSquare.getPieceType()]--;
+                board_.pieceCounts[destSquare]--;
                 destSquare = PieceType::PAWN + destSquare.getColour();
-                board_.pieceCounts[PieceType::PAWN]++;
+                board_.pieceCounts[destSquare]++;
             }
 
             if (move_.getType() == MoveType::ENPASSANT_TAKE)
@@ -165,7 +165,7 @@ public:
                 sourceSquare = takenSquare;
 
             if (takenSquare.isOccupied())
-                board_.pieceCounts[takenSquare.getPieceType()]++;
+                board_.pieceCounts[takenSquare]++;
 
             if (destSquare.getPieceType() == PieceType::KING)
                 board_.getKingLocus(destSquare.getColour()) = move_.getFrom();
