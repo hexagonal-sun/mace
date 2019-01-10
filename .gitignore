@@ -30,5 +30,7 @@ testsuite/perft-tester
 testsuite/perft-tester.o
 testsuite/zobrist-tester
 testsuite/zobrist-tester.o
+testsuite/piececounts
+testsuite/piececounts.o
 testsuite/*.log
 testsuite/*.trs
