@@ -138,6 +138,24 @@ void UCI::handleCommandGo(std::string line)
     os_ << "bestmove " <<  move << "\n";
 }
 
+void UCI::handleCommandPerft(std::string line)
+{
+    std::vector<std::string> tokens;
+    boost::split(tokens, line, boost::is_any_of(" "));
+
+    if (tokens.size() != 2)
+    {
+        std::cout << "Invalid syntax: 'perft [depth]'" << std::endl;
+        return;
+    }
+
+    size_t depth = std::stoi(tokens[1]);
+
+    size_t nodes = b_.perft(depth, true);
+
+    std::cout << "perft(" << depth << "): " << nodes << std::endl;
+}
+
 void UCI::mainLoop()
 {
     while (1)
@@ -145,6 +163,7 @@ void UCI::mainLoop()
         std::string line;
         std::string pos("position");
         std::string go("go");
+        std::string perft("perft");
 
         std::getline(is_, line);
 
@@ -156,6 +175,8 @@ void UCI::mainLoop()
             handleCommandIsReady();
         else if (line == "ucinewgame")
             handleCommandUCINewGame();
+        else if (line.compare(0, perft.length(), perft) == 0)
+            handleCommandPerft(line);
         else if(line.compare(0, pos.length(), pos) == 0)
             handleCommandPosition(line);
         else if(line.compare(0, go.length(), go) == 0)

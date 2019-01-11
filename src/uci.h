@@ -19,6 +19,7 @@ private:
     void handleCommandUCINewGame();
     void handleCommandPosition(std::string line);
     void handleCommandGo(std::string line);
+    void handleCommandPerft(std::string line);
     void dumpResults(SearchResults &res);
     Board b_;
 };
