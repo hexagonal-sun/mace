@@ -41,7 +41,7 @@ static int qsearch(Board &node, int alpha, int beta, int depth)
     if (!depth)
         return alpha;
 
-    auto moves = MoveGen::getLegalMoves(node);
+    auto moves = MoveGen::getPseudoLegalMoves(node);
 
     moves.erase(std::remove_if(moves.begin(),
                                moves.end(),
@@ -51,8 +51,13 @@ static int qsearch(Board &node, int alpha, int beta, int depth)
                  move.getType() == MoveType::ENPASSANT_TAKE);
     }), moves.end());
 
+    const auto colourToMove = node.getNextMoveColour();
+
     for (const auto move : moves) {
         Mover<MoverType::REVERT> m(move, node);
+
+        if (node.isInCheck(colourToMove))
+            continue;
 
         if (node.seenPosition())
             // If we have already seen this position, it's repetition.
@@ -134,20 +139,21 @@ static int absearch(Board &node, size_t depth,
     if (depth == 0)
         return qsearch(node, alpha, beta, res.getDepth() * 2);
 
-    auto moves = MoveGen::getLegalMoves(node, hashMove);
-
-    if (moves.size() == 0) {
-        if (node.isInCheck(node.getNextMoveColour()))
-            return (-INF) + 1 + ply;
-        else
-            return 0;
-    }
+    auto moves = MoveGen::getPseudoLegalMoves(node, hashMove);
 
     int val = -INF;
     Move bMove;
+    bool seenLegalMove = false;
+
+    const auto colourToMove = node.getNextMoveColour();
 
     for (const auto move : moves) {
         Mover<MoverType::REVERT> m(move, node);
+
+        if (node.isInCheck(colourToMove))
+            continue;
+
+        seenLegalMove = true;
 
         val = std::max(val, -absearch(node, depth - 1,
                                       -beta, -alpha, ply + 1, res));
@@ -167,6 +173,13 @@ static int absearch(Board &node, size_t depth,
 
         if (alpha >= beta)
             break;
+    }
+
+    if (!seenLegalMove) {
+        if (node.isInCheck(node.getNextMoveColour()))
+            return (-INF) + 1 + ply;
+        else
+            return 0;
     }
 
     // Only update the TT if we're not bailing out of a search due to

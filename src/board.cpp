@@ -55,19 +55,27 @@ Colour & Board::getNextMoveColour(void)
 Move Board::validateMove(const Locus & from, const Locus &to,
                          const MoveType promotion)
 {
-    const auto &allowedMoves = MoveGen::getLegalMoves(*this);
+    Move ret;
+
+    const auto &allowedMoves = MoveGen::getPseudoLegalMoves(*this);
+    const auto colourToMove = getNextMoveColour();
 
     for (const auto &m : allowedMoves) {
         if (m.getFrom() == from && m.getTo() == to) {
             if (!isPromotion(promotion))
-                return m;
+                ret = m;
 
             if (m.getType() == promotion)
-                return m;
+                ret = m;
         }
     }
 
-    return Move();
+    Mover<MoverType::REVERT> mover(ret, *this);
+
+    if (isInCheck(colourToMove))
+        return Move();
+
+    return ret;
 }
 
 void Board::printBoard(std::ostream &stream) const
@@ -266,9 +274,15 @@ int Board::perft(int depth, bool divide,
 
     int nodes = 0;
 
-    for (const auto &move : MoveGen::getLegalMoves(*this)) {
+    const auto colourToMove = getNextMoveColour();
+
+    for (const auto &move : MoveGen::getPseudoLegalMoves(*this)) {
         {
             Mover<MoverType::REVERT> m(move, *this);
+
+            // Skip non-legal moves.
+            if (isInCheck(colourToMove))
+                continue;
 
             if (moveCallback)
                 moveCallback(move);

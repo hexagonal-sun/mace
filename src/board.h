@@ -55,6 +55,8 @@ public:
             return zobHash.applyBoardState(board_.getHash(), *this);
         }
 
+    bool isLegalMove(Move m);
+
     const size_t getHalfMoveClock() const { return halfMoveClock_; }
     size_t &getHalfMoveClock() { return halfMoveClock_; }
 

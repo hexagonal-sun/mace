@@ -284,7 +284,7 @@ static int calculateMVVLVA(const Move &m, const Board &b)
 }
 
 moveList_t
-MoveGen::getLegalMoves(Board &b, Move hashMove)
+MoveGen::getPseudoLegalMoves(Board &b, Move hashMove)
 {
     moveList_t quietMoves;
     moveList_t takeMoves;
@@ -305,15 +305,6 @@ MoveGen::getLegalMoves(Board &b, Move hashMove)
     // Append the quiet moves onto the end of take moves to produce
     // the full move list.
     takeMoves.insert(takeMoves.end(), quietMoves.begin(), quietMoves.end());
-
-    // Prune non-legal pseudo moves.
-    takeMoves.erase(std::remove_if(takeMoves.begin(),
-                                   takeMoves.end(),
-                                   [&](const Move &move)
-    {
-        Mover<MoverType::REVERT> m(move, b);
-        return b.isInCheck(colourToMove);
-    }), takeMoves.end());
 
     if (hashMove.isValid())
     {
